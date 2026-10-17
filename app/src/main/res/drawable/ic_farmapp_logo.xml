@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="64dp"
+    android:height="64dp"
+    android:viewportWidth="64"
+    android:viewportHeight="64">
+    <!-- Recurso vectorial local; aparece en Resource Manager como drawable. -->
+    <path
+        android:fillColor="#1B783F"
+        android:pathData="M32,4 A28,28 0,1 1,32 60 A28,28 0,1 1,32 4 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M26,15 L38,15 L38,26 L49,26 L49,38 L38,38 L38,49 L26,49 L26,38 L15,38 L15,26 L26,26 Z" />
+</vector>

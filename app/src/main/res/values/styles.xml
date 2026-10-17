@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tema XML requerido al iniciar Activity; paletas Compose van en ui/theme. -->
+    <style name="Theme.FarmApp" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/farmapp_launcher_background</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+    <!-- Solo para la Activity con Views; preserva Theme.FarmApp del flujo Compose. -->
+    <style name="Theme.FarmApp.Legacy" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/farmapp_launcher_green</item>
+        <item name="colorSecondary">@color/farmapp_launcher_green</item>
+    </style>
+</resources>

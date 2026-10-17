@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Identidad visual de FarmApp -->
+    <string name="app_name">FarmApp</string>
+    <string name="brand_tagline">Tu farmacia a un toque</string>
+    <string name="cd_farmapp_logo">Logotipo de FarmApp con símbolo de farmacia</string>
+
+    <!-- HU01: registro e inicio de sesión -->
+    <string name="auth_title_register">Crear cuenta</string>
+    <string name="auth_title_sign_in">Iniciar sesión</string>
+    <string name="auth_email_label">Correo electrónico</string>
+    <string name="auth_password_label">Contraseña</string>
+    <string name="auth_show_password">Mostrar</string>
+    <string name="auth_hide_password">Ocultar</string>
+    <string name="auth_register_button">Registrarme</string>
+    <string name="auth_sign_in_button">Ingresar</string>
+    <string name="auth_forgot_password">¿Olvidaste tu contraseña?</string>
+    <string name="auth_switch_sign_in">¿Ya tienes cuenta? Inicia sesión</string>
+    <string name="auth_switch_register">¿No tienes cuenta? Regístrate</string>
+
+    <!-- Mensajes de autenticación: se referencian desde el ViewModel por ID -->
+    <string name="auth_error_invalid_email">Escribe un correo electrónico válido.</string>
+    <string name="auth_error_password_short">La contraseña debe tener al menos 6 caracteres.</string>
+    <string name="auth_error_sign_in">No fue posible ingresar. Revisa los datos y la conexión.</string>
+    <string name="auth_error_reset_email">Primero escribe un correo electrónico válido.</string>
+    <string name="auth_info_password_reset">Si la cuenta existe, revisa tu correo para recuperar la contraseña.</string>
+    <string name="auth_google_button">Continuar con Google</string>
+    <string name="auth_or_continue_with">O continúa con</string>
+    <string name="auth_error_google">No fue posible iniciar sesión con Google. Inténtalo nuevamente.</string>
+    <string name="auth_error_google_setup">Falta configurar el acceso con Google en Firebase. Revisa la guía de instalación.</string>
+    <string name="auth_error_reset_request">No se pudo procesar la solicitud. Comprueba tu conexión.</string>
+
+    <!-- Pantalla temporal tras iniciar sesión -->
+    <string name="home_email_unknown">Correo no disponible</string>
+    <string name="home_welcome">Bienvenido a FarmApp</string>
+    <string name="home_session_email">Sesión iniciada: %1$s</string>
+    <string name="home_auth_section">HU01: Autenticación</string>
+    <string name="home_next_steps">Tu cuenta se conectó correctamente. En HU02 agregaremos perfiles y roles; en HU03, el catálogo de medicamentos.</string>
+    <string name="home_sign_out">Cerrar sesión</string>
+    <!-- Cotejo 03: indicador de contraseña mostrado en el registro -->
+    <string name="password_strength_label">Fortaleza orientativa: %1$s</string>
+    <string name="password_strength_short">corta o vacía</string>
+    <string name="password_strength_basic">básica</string>
+    <string name="password_strength_improved">mejorada</string>
+    <string name="password_requirement_length">al menos 6 caracteres</string>
+    <string name="password_requirement_letter">incluir una letra</string>
+    <string name="password_requirement_number">incluir un número</string>
+    <string name="password_check_met">Cumple: %1$s</string>
+    <string name="password_check_missing">Sugerencia: %1$s</string>
+    <string name="password_checks_completed">Recomendaciones cumplidas: %1$d de %2$d</string>
+    <string name="password_strength_explanation">El registro requiere al menos 6 caracteres. Las demás sugerencias son opcionales. Este indicador no garantiza la seguridad de una contraseña.</string>
+    <!-- Cotejo 07: catálogo local de DEMOSTRACIÓN; datos ficticios para practicar Kotlin -->
+    <string name="catalog_demo_title">Vista previa del catálogo</string>
+    <string name="catalog_demo_disclaimer">Ejemplo educativo con productos, precios y existencias ficticios. Aún no permite comprar.</string>
+    <string name="catalog_search_label">Buscar por nombre o código</string>
+    <string name="catalog_all_categories">Todas</string>
+    <string name="catalog_category_hygiene">Higiene</string>
+    <string name="catalog_category_first_aid">Primeros auxilios</string>
+    <string name="catalog_category_equipment">Equipos</string>
+    <string name="catalog_demo_counts">%1$d productos · %2$d unidades de muestra</string>
+    <string name="catalog_empty">No se encontraron productos de demostración.</string>
+    <string name="catalog_sku_value">Código: %1$s</string>
+    <string name="catalog_price_value">Precio simulado: S/ %1$.2f</string>
+    <string name="catalog_stock_value">Existencias simuladas: %1$d (%2$s)</string>
+    <string name="catalog_stock_empty">Agotado</string>
+    <string name="catalog_stock_low">Stock bajo</string>
+    <string name="catalog_stock_available">Disponible</string>
+    <string name="catalog_unavailable_note">No disponible en la simulación</string>
+    <!-- Cotejo 10: selección explícita del tema Material 3 -->
+    <string name="theme_label">Tema:</string>
+    <string name="theme_system">Sistema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="theme_preview_text">La apariencia cambia sin reiniciar FarmApp.</string>
+    <!-- Cotejo 11: expansión animada de tarjetas con spring() -->
+    <string name="catalog_show_details">Ver detalles</string>
+    <string name="catalog_hide_details">Ocultar detalles</string>
+    <string name="catalog_detail_category">Categoría: %1$s</string>
+    <string name="catalog_detail_stock_status">Estado simulado: %1$s</string>
+    <string name="catalog_detail_note">Vista educativa: la información no representa inventario real.</string>
+    <!-- Cotejo 12: accesibilidad y estados semánticos traducibles -->
+    <string name="a11y_auth_processing">Procesando solicitud…</string>
+    <string name="a11y_show_password">Mostrar contraseña</string>
+    <string name="a11y_hide_password">Ocultar contraseña</string>
+    <string name="a11y_details_expanded">Detalles expandidos</string>
+    <string name="a11y_details_collapsed">Detalles contraídos</string>
+    <!-- Cotejo 16: navegación, TopAppBar y compartir por Intent.ACTION_SEND -->
+    <string name="nav_open_catalog">Explorar catálogo de demostración</string>
+    <string name="nav_catalog_title">Catálogo de FarmApp</string>
+    <string name="nav_back">Atrás</string>
+    <string name="nav_view_product">Abrir ficha</string>
+    <string name="nav_product_title">Detalle del producto</string>
+    <string name="nav_unknown_product">Este producto de demostración no está disponible.</string>
+    <string name="nav_demo_product_notice">Datos ficticios usados para aprender navegación. No constituye una oferta de venta.</string>
+    <string name="nav_share_product">Compartir ficha educativa</string>
+    <string name="nav_share_chooser_title">Compartir desde FarmApp</string>
+    <string name="nav_share_message">Producto de demostración en FarmApp</string>
+    <!-- Cotejo 17: navegación adaptable; un único NavHost en todos los tamaños -->
+    <string name="nav_home_title">Inicio</string>
+    <string name="nav_catalog_short">Catálogo</string>
+    <!-- Cotejo 18: sección de detalles en diseño lista + detalle -->
+    <string name="adaptive_detail_pane_title">Ficha del producto seleccionado</string>
+    <!-- Cotejo 19: corrutinas; consulta local ASÍNCRONA y simulada -->
+    <string name="async_demo_title">Consulta asíncrona de inventario (demo)</string>
+    <string name="async_demo_disclaimer">Solo existencias ficticias de aprendizaje. No consulta una farmacia real.</string>
+    <string name="async_demo_refresh">Consultar</string>
+    <string name="async_demo_cancel">Cancelar</string>
+    <string name="async_demo_idle">Pulsa Consultar para iniciar la simulación.</string>
+    <string name="async_demo_loading">Consultando categorías en paralelo…</string>
+    <string name="async_demo_result">Consulta terminada: %1$d unidades ficticias.</string>
+    <string name="async_demo_cancelled">Consulta cancelada por el usuario.</string>
+    <string name="async_demo_error">No se pudo completar la consulta. Puedes reintentar.</string>
+    <!-- Cotejo 20: Race Tracker aplicado a sincronización ficticia -->
+    <string name="sync_demo_title">Progreso de sincronización (demo)</string>
+    <string name="sync_demo_disclaimer">Dos tareas simuladas y concurrentes. No modifica datos reales.</string>
+    <string name="sync_demo_catalog">Productos</string>
+    <string name="sync_demo_stock">Existencias</string>
+    <string name="sync_demo_start">Iniciar</string>
+    <string name="sync_demo_pause">Pausar</string>
+    <string name="sync_demo_resume">Reanudar</string>
+    <string name="sync_demo_reset">Reiniciar</string>
+    <string name="sync_demo_idle">Preparado para iniciar la demostración.</string>
+    <string name="sync_demo_running">Sincronización de prueba en progreso.</string>
+    <string name="sync_demo_paused">Pausado; puedes reanudar desde el mismo progreso.</string>
+    <string name="sync_demo_finished">Las dos tareas de demostración terminaron.</string>
+    <string name="sync_demo_error">La demostración falló. Puedes reiniciarla.</string>
+    <!-- C21: REST + Retrofit + kotlinx.serialization. Productos EXTERNOS de prueba. -->
+    <string name="net_demo_title">Productos externos de cuidado de la piel (REST)</string>
+    <string name="net_demo_warning">API pública DummyJSON con datos de ejemplo en USD. No son medicamentos, existencias ni precios reales de FarmApp.</string>
+    <string name="net_demo_fetch">Consultar Internet</string>
+    <string name="net_demo_raw_button">Ver JSON</string>
+    <string name="net_demo_raw_caption">Fragmento del JSON original (máximo 700 caracteres):</string>
+    <string name="net_demo_idle">Pulsa Consultar Internet para obtener datos externos.</string>
+    <string name="net_demo_loading_text">Descargando datos de ejemplo…</string>
+    <string name="net_demo_success">Recibidos %1$d productos externos (demo).</string>
+    <string name="net_demo_price">Precio de ejemplo: USD %1$s</string>
+    <string name="net_demo_empty">La API no devolvió productos.</string>
+    <string name="net_demo_error_network">Sin conexión o tiempo de espera agotado. Comprueba Internet y reintenta.</string>
+    <string name="net_demo_error_http">El servicio respondió con un error HTTP. Inténtalo nuevamente.</string>
+    <string name="net_demo_error_parse">No se pudo interpretar el JSON recibido.</string>
+    <string name="net_demo_error_generic">No se pudo completar la consulta. Inténtalo nuevamente.</string>
+    <!-- C23: galería educativa de imágenes externas, no inventario real. -->
+    <string name="gallery_open">Ver galería de imágenes</string>
+    <string name="gallery_title">Fotos externas (demo)</string>
+    <string name="gallery_intro">Consulta imágenes de demostración. Requiere Internet.</string>
+    <string name="gallery_retry">Volver a intentar</string>
+    <string name="gallery_image_description">Imagen de demostración de %1$s</string>
+    <!-- Cotejo 24: taller SQL con base SQLite educativa y datos ficticios -->
+    <string name="sql_home_open">Laboratorio SQL local (demo)</string>
+    <string name="sql_title">Laboratorio SQL de FarmApp</string>
+    <string name="sql_disclaimer">Base de datos local y aislada con 6 productos ficticios. No contiene ventas, pacientes ni existencias reales.</string>
+    <string name="sql_statement_heading">Sentencia SQL que se ejecuta:</string>
+    <string name="sql_bound_args">Parámetros seguros: %1$s</string>
+    <string name="sql_query_all">SELECT + ORDER BY + LIMIT</string>
+    <string name="sql_query_low">WHERE (stock bajo)</string>
+    <string name="sql_query_like">LIKE (gel)</string>
+    <string name="sql_query_distinct">DISTINCT</string>
+    <string name="sql_query_group">GROUP BY + COUNT + SUM</string>
+    <string name="sql_crud_heading">Escribir en la base de práctica</string>
+    <string name="sql_crud_note">INSERT agrega FA-SQL-EXTRA, UPDATE cambia su stock a 11 y DELETE elimina solo esa fila. Restaurar restablece los 6 registros ficticios.</string>
+    <string name="sql_restore">Restaurar ejemplos</string>
+    <string name="sql_feedback_inserted">INSERT: se agregó el registro de práctica.</string>
+    <string name="sql_feedback_exists">INSERT: ese SKU ya existe; no se duplicó.</string>
+    <string name="sql_feedback_updated">UPDATE: existencias del registro de práctica actualizadas.</string>
+    <string name="sql_feedback_not_found">El registro de práctica aún no existe. Pulsa INSERT primero.</string>
+    <string name="sql_feedback_deleted">DELETE: se eliminó el registro de práctica.</string>
+    <string name="sql_feedback_restored">Se restauraron los seis registros originales.</string>
+    <string name="sql_error">Error de base de datos local. Vuelve a seleccionar una consulta.</string>
+    <string name="sql_result_count">Resultados: %1$d</string>
+    <string name="sql_group_row">%1$s: %2$d productos; %3$d unidades</string>
+    <string name="sql_stock">Existencias de práctica: %1$d</string>
+
+    <!-- C25: segunda base SQLite pero usando Room; NO es el laboratorio SQL C24 -->
+    <string name="room_home_open">Laboratorio Room local (demo)</string>
+    <string name="room_title">Persistencia con Room</string>
+    <string name="room_disclaimer">Base local independiente con artículos ficticios. Guarda la información aunque cierres la app; no gestiona el inventario real.</string>
+    <string name="room_form_title">Añadir artículo de prueba</string>
+    <string name="room_name">Nombre del artículo</string>
+    <string name="room_price">Precio de ejemplo (S/, ej. 8.50)</string>
+    <string name="room_stock">Cantidad (0 a 99999)</string>
+    <string name="room_save">Guardar en Room</string>
+    <string name="room_saved">Artículo guardado en la base Room.</string>
+    <string name="room_updated">Cantidad actualizada.</string>
+    <string name="room_deleted">Artículo eliminado.</string>
+    <string name="room_invalid">Revisa nombre, precio (2 decimales como máximo) y cantidad.</string>
+    <string name="room_error">Error de almacenamiento. Intenta otra vez.</string>
+    <string name="room_busy">Guardando cambios…</string>
+    <string name="room_count">Artículos guardados: %1$d</string>
+    <string name="room_empty">La base Room está vacía. Agrega tu primer artículo de práctica.</string>
+    <string name="room_item_summary">Precio de ejemplo: S/ %1$d.%2$s · Existencias: %3$d</string>
+    <string name="room_increase">+1 unidad</string>
+    <string name="room_delete">Eliminar</string>
+    <!-- C26: Inventario Room con pantallas de detalles, edición y venta atómica. -->
+    <string name="room26_view_detail">Ver detalles</string>
+    <string name="room26_detail_title">Detalle del artículo (demo)</string>
+    <string name="room26_edit_title">Editar artículo (demo)</string>
+    <string name="room26_loading">Cargando artículo local…</string>
+    <string name="room26_not_found">El artículo ya no está disponible.</string>
+    <string name="room26_sell_one">Vender 1 unidad</string>
+    <string name="room26_out_of_stock">Artículo agotado. No se puede vender.</string>
+    <string name="room26_sold">Venta simulada: se descontó una unidad.</string>
+    <string name="room26_edit_button">Editar artículo</string>
+    <string name="room26_save_changes">Guardar cambios</string>
+    <!-- Cotejo 27: Preferences DataStore, persistencia de apariencia y disposición -->
+    <string name="pref_gallery_title">Presentación:</string>
+    <string name="pref_gallery_grid">Cuadrícula</string>
+    <string name="pref_gallery_list">Lista</string>
+    <string name="pref_storage_description">El tema y la vista se conservan al reiniciar FarmApp.</string>
+    <string name="pref_error">No se pudo leer o guardar la preferencia en este momento.</string>
+
+    <!-- Cotejo 28: WorkManager para informar datos ficticios de Room sin servidor -->
+    <string name="work_home_open">Generar informe en segundo plano (demo)</string>
+    <string name="work_title">Informe con WorkManager</string>
+    <string name="work_disclaimer">Demostración educativa con artículos ficticios del laboratorio Room. No utiliza inventario real ni envía datos a Internet.</string>
+    <string name="work_steps_title">Dos tareas encadenadas</string>
+    <string name="work_steps_description">1. Calcular el resumen de artículos guardados. 2. Guardar un archivo de texto local con los resultados. WorkManager conserva el trabajo pendiente aunque cierres la pantalla.</string>
+    <string name="work_state_idle">No hay tareas programadas.</string>
+    <string name="work_state_queued">Trabajo programado; esperando su turno o las condiciones del dispositivo.</string>
+    <string name="work_state_preparing">Preparando resumen de Room…</string>
+    <string name="work_state_saving">Guardando informe local…</string>
+    <string name="work_state_completed">Informe generado correctamente.</string>
+    <string name="work_state_failed">No se pudo generar el informe. Puedes reintentarlo.</string>
+    <string name="work_state_cancelled">Trabajo cancelado.</string>
+    <string name="work_saved_file">Archivo: %1$s</string>
+    <string name="work_start">Generar / volver a generar</string>
+    <string name="work_cancel">Cancelar trabajo</string>
+    <string name="work_constraints_notice">Condiciones de esta demostración: la preparación espera a que la batería no esté baja y el guardado espera espacio libre suficiente. No necesita conexión a Internet. WorkManager decide cuándo comenzar; si está en espera, no significa que haya fallado.</string>
+    <string name="work_local_file_note">El archivo se guarda en el almacenamiento privado de FarmApp, carpeta files/reportes_demo. Esta pantalla no envía ni comparte datos. Para inspeccionarlo usa Device Explorer en Android Studio.</string>
+    <!-- C30: laboratorio de Android Views/Fragment con Navigation XML -->
+    <string name="legacy_home_open">Inventario con objetos View (demo)</string>
+    <string name="legacy_title">Inventario con Views</string>
+    <string name="legacy_demo_warning">Interoperabilidad Views y Compose: la lista usa RecyclerView con tarjetas Compose y datos ficticios de Room.</string>
+    <string name="legacy_close">Cerrar</string>
+    <string name="legacy_empty">Aún no hay artículos. Pulsa + para agregar uno.</string>
+    <string name="legacy_add">Agregar artículo de práctica</string>
+    <string name="legacy_item_subtitle">S/ %1$.2f · %2$d unidades</string>
+    <string name="legacy_item_accessibility">Editar %1$s, existencias: %2$d</string>
+    <string name="legacy_compose_edit_hint">Editar</string>
+    <string name="legacy_dialog_add">Agregar artículo (Views)</string>
+    <string name="legacy_dialog_edit">Editar artículo (Views)</string>
+    <string name="legacy_save">Guardar</string>
+    <string name="legacy_cancel">Cancelar</string>
+    <string name="legacy_validation_error">Revisa el nombre, precio y existencias.</string>
+    <string name="legacy_save_error">No se pudieron guardar los cambios.</string>
+    <string name="legacy_missing_item">El artículo ya no existe en Room.</string>
+    <!-- Cotejo 32: interoperabilidad ViewBinding/XML dentro de Compose -->
+    <string name="room32_open_button">Editar con formulario XML en Compose</string>
+    <string name="room32_dialog_title">Editar con Views dentro de Compose</string>
+    <string name="room32_dialog_description">Este formulario reutiliza los EditText XML del Cotejo 30. Los cambios se guardan en la misma base Room de demostración.</string>
+</resources>

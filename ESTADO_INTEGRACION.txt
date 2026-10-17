@@ -1,0 +1,9 @@
+FarmApp base Gradle 32 cotejos
+Fuentes acumuladas: SI
+Archivos raíz de Gradle: SI
+Dependencias enumeradas: SI
+AndroidManifest.xml y recursos: SI
+Gradle Wrapper oficial (JAR): PENDIENTE, se genera con preparar-gradle.ps1
+Firebase google-services.json: PENDIENTE de usuario
+Compilación Android y generación APK: NO EJECUTADAS
+Pruebas JUnit/Compose: NO EJECUTADAS en este paquete

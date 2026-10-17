@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/legacy_inventory_graph"
+    app:startDestination="@id/legacy_tracker">
+    <fragment
+        android:id="@+id/legacy_tracker"
+        android:name="com.example.farmapp.ui.legacy.LegacyTrackerFragment"
+        android:label="@string/legacy_title">
+        <action
+            android:id="@+id/action_legacyTracker_to_legacyItemDialog"
+            app:destination="@id/legacy_item_dialog" />
+    </fragment>
+    <dialog
+        android:id="@+id/legacy_item_dialog"
+        android:name="com.example.farmapp.ui.legacy.LegacyItemDialogFragment"
+        android:label="@string/legacy_dialog_add">
+        <argument
+            android:name="itemId"
+            app:argType="long"
+            android:defaultValue="0L" />
+    </dialog>
+</navigation>
