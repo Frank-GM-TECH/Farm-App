@@ -8,6 +8,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollToNode
 import androidx.navigation.compose.ComposeNavigator
@@ -90,9 +91,15 @@ class FarmAppNavigationTest {
         setApp(true)
         rule.onNodeWithTag("navigate_to_catalog").performClick()
         rule.onNodeWithTag("back_from_catalog").performClick()
-        rule.onNodeWithTag("home_sign_out").performClick()
+        rule.onNodeWithTag("home_sign_out")
+            .performScrollTo()
+            .performClick()
         rule.waitForIdle()
-        rule.onNodeWithTag("auth_submit_button").assertIsDisplayed()
+        assertEquals(
+            FarmAppDestinations.AUTH,
+            navController.currentDestination?.route
+        )
+        rule.onNodeWithTag("auth_submit_button").performScrollTo().assertIsDisplayed()
         assertEquals(FarmAppDestinations.AUTH, navController.currentDestination?.route)
         rule.runOnIdle { assertTrue(navController.popBackStack().not()) }
     }

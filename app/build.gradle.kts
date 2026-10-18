@@ -57,7 +57,7 @@ kotlin {
 val composeBomVersion = "2026.06.00"
 val roomVersion = "2.8.5"
 val workVersion = "2.11.2"
-val navigationVersion = "2.10.2"
+val navigationVersion = "2.9.8"
 
 // Dependencias de los 32 cotejos, centralizadas en un solo lugar.
 dependencies {
@@ -73,7 +73,7 @@ dependencies {
     implementation("androidx.compose.animation:animation")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material3:material3-window-size-class")
-    implementation("androidx.material:material-icons-extended:1.7.8")
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.9.4")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.4")

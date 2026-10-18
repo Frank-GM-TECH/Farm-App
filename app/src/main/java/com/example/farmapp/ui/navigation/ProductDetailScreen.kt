@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.example.farmapp.R
 import com.example.farmapp.catalog.DemoProduct
 import com.example.farmapp.ui.catalog.AnimatedProductDemoCard
+import androidx.compose.foundation.layout.Arrangement
 
 /** Destino independiente del cotejo 16: sigue siendo válido en celulares. */
 @OptIn(ExperimentalMaterial3Api::class)

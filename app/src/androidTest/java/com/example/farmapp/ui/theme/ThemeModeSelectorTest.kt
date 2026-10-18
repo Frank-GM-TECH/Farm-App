@@ -27,7 +27,8 @@ class ThemeModeSelectorTest {
         var backgroundObserved = Color.Unspecified
         composeRule.setContent {
             FarmAppTheme(mode = mode) {
-                SideEffect { backgroundObserved = MaterialTheme.colorScheme.background }
+                val currentBackground = MaterialTheme.colorScheme.background
+                SideEffect { backgroundObserved = currentBackground }
                 Column {
                     ThemeModeSelector(selectedMode = mode, onModeSelected = { mode = it })
                     Surface(modifier = Modifier.testTag("theme_surface")) { }

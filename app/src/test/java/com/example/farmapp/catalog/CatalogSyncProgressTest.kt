@@ -40,7 +40,7 @@ class CatalogSyncProgressTest {
         assertEquals(100, vm.uiState.value.stockProgress)
         assertEquals(SyncPhase.FINISHED, vm.uiState.value.phase)
         // Máximo 2000 ms, no la suma secuencial (2000 + 1000).
-        assertEquals(2000L, currentTime)
+        assertEquals(2000L, testScheduler.currentTime)
     }
 
     @Test fun pausaDetieneAmbosYReanudaDesdeElValorAnterior() = runTest(dispatcherRule.dispatcher) {
@@ -81,7 +81,7 @@ class CatalogSyncProgressTest {
         vm.startOrResume()
         vm.startOrResume()
         advanceUntilIdle()
-        assertEquals(2000L, currentTime)
+        assertEquals(2000L, testScheduler.currentTime)
         assertEquals(SyncPhase.FINISHED, vm.uiState.value.phase)
     }
 

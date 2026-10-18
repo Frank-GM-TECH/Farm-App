@@ -43,7 +43,7 @@ class CatalogAvailabilityTest {
         assertTrue(request.isCompleted)
         assertEquals(34, request.await().totalUnits)
         // Si se ejecutara secuencialmente tardaría 3000 ms virtuales.
-        assertEquals(1000L, currentTime)
+        assertEquals(1000L, testScheduler.currentTime)
     }
 
     @Test fun exito_localCoincideConInventarioFicticio() = runTest(main.dispatcher) {

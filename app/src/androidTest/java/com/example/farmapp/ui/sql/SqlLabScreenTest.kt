@@ -1,10 +1,10 @@
 package com.example.farmapp.ui.sql
 
-import androidx.compose.ui.test.assertExists
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performScrollToNode
 import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.example.farmapp.data.sql.SqlLabProduct
@@ -44,7 +44,7 @@ class SqlLabScreenTest {
                 SqlLabScreen(SqlLabUiState(), {}, { selected = it }, {}, {}, {}, {})
             }
         }
-        composeRule.onNodeWithTag("sql_query_NAME_LIKE").performClick()
+        composeRule.onNodeWithTag("sql_query_NAME_LIKE").performScrollTo().performClick()
         composeRule.runOnIdle { assertEquals(SqlLabQuery.NAME_LIKE, selected) }
     }
 
