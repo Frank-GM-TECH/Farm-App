@@ -1,3 +1,4 @@
+
 package com.example.farmapp.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
@@ -27,77 +28,138 @@ import androidx.compose.ui.unit.dp
 import com.example.farmapp.R
 import com.example.farmapp.ui.components.FarmAppBrandHeader
 
-/** Pantalla de Inicio sin NavController: recibe callbacks, según guía oficial. */
 @Composable
 fun HomeScreen(
     email: String,
     onSignOut: () -> Unit,
     onOpenCatalog: () -> Unit = {},
+    onOpenProfile: () -> Unit = {},
     onOpenSqlLab: () -> Unit = {},
     onOpenRoomDemo: () -> Unit = {},
     onOpenBackgroundReport: () -> Unit = {},
     onOpenLegacyViews: () -> Unit = {}
 ) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
+    ) {
         Column(
-            modifier = Modifier.widthIn(max = 760.dp).fillMaxWidth()
+            modifier = Modifier
+                .widthIn(max = 760.dp)
+                .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
-                .padding(24.dp).testTag("home_screen"),
+                .padding(24.dp)
+                .testTag("home_screen"),
             verticalArrangement = Arrangement.spacedBy(14.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            FarmAppBrandHeader(modifier = Modifier.fillMaxWidth())
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                stringResource(R.string.home_welcome),
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.fillMaxWidth().semantics { heading() }
+            FarmAppBrandHeader(
+                modifier = Modifier.fillMaxWidth()
             )
-            Text(stringResource(R.string.home_session_email, email), modifier = Modifier.fillMaxWidth())
-            Card(modifier = Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large) {
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = stringResource(R.string.home_welcome),
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .semantics { heading() }
+            )
+
+            Text(
+                text = stringResource(
+                    R.string.home_session_email,
+                    email
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.large
+            ) {
                 Column(modifier = Modifier.padding(20.dp)) {
                     Text(
-                        stringResource(R.string.home_auth_section),
+                        text = stringResource(R.string.home_auth_section),
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.semantics { heading() }
                     )
+
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(stringResource(R.string.home_next_steps))
+
+                    Text(
+                        text = stringResource(R.string.home_next_steps)
+                    )
                 }
             }
+
+            // Abrir catálogo
             Button(
                 onClick = onOpenCatalog,
-                modifier = Modifier.fillMaxWidth().testTag("navigate_to_catalog")
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("navigate_to_catalog")
             ) {
                 Text(stringResource(R.string.nav_open_catalog))
             }
+
+            // HU02: Abrir perfil del usuario
+            OutlinedButton(
+                onClick = onOpenProfile,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("navigate_to_profile")
+            ) {
+                Text("Mi perfil")
+            }
+
+            // Laboratorio SQL
             OutlinedButton(
                 onClick = onOpenSqlLab,
-                modifier = Modifier.fillMaxWidth().testTag("navigate_to_sql")
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("navigate_to_sql")
             ) {
                 Text(stringResource(R.string.sql_home_open))
             }
+
+            // Demostración Room
             OutlinedButton(
                 onClick = onOpenRoomDemo,
-                modifier = Modifier.fillMaxWidth().testTag("navigate_to_room")
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("navigate_to_room")
             ) {
                 Text(stringResource(R.string.room_home_open))
             }
+
+            // Trabajo en segundo plano
             OutlinedButton(
                 onClick = onOpenBackgroundReport,
-                modifier = Modifier.fillMaxWidth().testTag("navigate_to_work")
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("navigate_to_work")
             ) {
                 Text(stringResource(R.string.work_home_open))
             }
+
+            // Interoperabilidad con objetos View
             OutlinedButton(
                 onClick = onOpenLegacyViews,
-                modifier = Modifier.fillMaxWidth().testTag("navigate_to_legacy_views")
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("navigate_to_legacy_views")
             ) {
                 Text(stringResource(R.string.legacy_home_open))
             }
+
+            // Cerrar sesión
             OutlinedButton(
                 onClick = onSignOut,
-                modifier = Modifier.fillMaxWidth().testTag("home_sign_out")
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("home_sign_out")
             ) {
                 Text(stringResource(R.string.home_sign_out))
             }

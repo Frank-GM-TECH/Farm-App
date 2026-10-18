@@ -27,15 +27,21 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import com.example.farmapp.profile.ProfileRepository
 
 /** C22: sustitución explícita de dependencias, sin Firebase ni Retrofit reales. */
 @OptIn(ExperimentalCoroutinesApi::class)
 class ManualDiViewModelTest {
     @get:Rule val main = MainDispatcherRule()
 
+
     private class FakeAppContainer(
         override val remoteProductsRepository: RemoteProductsRepository
     ) : AppContainer {
+
+        override val profileRepository: ProfileRepository
+            get() = error("El perfil no se utiliza en esta prueba")
+
         override val inventoryReportRepository: InventoryReportRepository = object : InventoryReportRepository {
             override val status: Flow<ReportWorkUiState> = flowOf(ReportWorkUiState())
             override fun enqueueReport() = Unit

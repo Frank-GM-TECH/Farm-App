@@ -5,6 +5,7 @@ object FarmAppDestinations {
     const val AUTH = "auth"
     const val HOME = "home"
     const val CATALOG = "catalog"
+    const val PROFILE = "profile"
     const val REMOTE_GALLERY = "remote_gallery"
     const val SQL_LAB = "sql_lab"
     const val ROOM_DEMO = "room_demo"

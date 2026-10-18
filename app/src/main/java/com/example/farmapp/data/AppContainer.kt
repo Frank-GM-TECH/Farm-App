@@ -28,6 +28,9 @@ import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
+import com.example.farmapp.profile.ProfileRepository
+import com.example.farmapp.profile.FirestoreProfileRepository
+import com.google.firebase.firestore.FirebaseFirestore
 
 /** C22: contrato de dependencias; permite sustituir las implementaciones durante tests. */
 interface AppContainer {
@@ -38,6 +41,7 @@ interface AppContainer {
     val roomDemoRepository: RoomDemoRepository
     val userPreferencesRepository: UserPreferencesRepository
     val inventoryReportRepository: InventoryReportRepository
+    val profileRepository: ProfileRepository
 }
 
 /**
@@ -47,6 +51,11 @@ interface AppContainer {
  * Las consultas REST son solo sobre productos de DEMOSTRACIÓN de DummyJSON.
  */
 class DefaultAppContainer(private val appContext: Context) : AppContainer {
+    override val profileRepository: ProfileRepository by lazy {
+        FirestoreProfileRepository(
+            FirebaseFirestore.getInstance()
+        )
+    }
     private val baseUrl = "https://dummyjson.com/"
 
     private val json by lazy {
