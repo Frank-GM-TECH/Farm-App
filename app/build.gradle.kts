@@ -58,6 +58,7 @@ val composeBomVersion = "2026.06.00"
 val roomVersion = "2.8.5"
 val workVersion = "2.11.2"
 val navigationVersion = "2.9.8"
+val cameraXVersion = "1.5.3"
 
 // Dependencias de los 32 cotejos, centralizadas en un solo lugar.
 dependencies {
@@ -110,6 +111,29 @@ dependencies {
     implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
     implementation("androidx.exifinterface:exifinterface:1.4.2")
+
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
+
+    // =====================================
+    // HU03 - ESCÁNER DE CÓDIGOS DE BARRAS
+    // =====================================
+
+    // CameraX: cámara y análisis de imágenes.
+    implementation("androidx.camera:camera-core:$cameraXVersion")
+    implementation("androidx.camera:camera-camera2:$cameraXVersion")
+    implementation("androidx.camera:camera-lifecycle:$cameraXVersion")
+    implementation("androidx.camera:camera-view:$cameraXVersion")
+
+    // ML Kit: lector de códigos de barras
+    // con modelo incluido para uso sin conexión.
+    implementation("com.google.mlkit:barcode-scanning:17.3.0")
+
+
+    // HU03 - Proporciona ListenableFuture para CameraX.
+    implementation("com.google.guava:guava:33.4.8-android")
+
+
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
