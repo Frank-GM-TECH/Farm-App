@@ -87,6 +87,7 @@ class OfflineCartRepository(
         requireCurrentUser(userId)
 
         if (
+            !product.active ||
             product.stock <= 0 ||
             product.priceCents < 0
         ) {
@@ -129,7 +130,11 @@ class OfflineCartRepository(
 
         requireCurrentUser(userId)
 
-        if (quantity > product.stock) {
+        if (
+            !product.active ||
+            quantity > product.stock ||
+            product.priceCents < 0
+        ) {
             return false
         }
 
