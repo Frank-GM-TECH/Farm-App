@@ -181,6 +181,7 @@ class CheckoutViewModel : ViewModel() {
     // CUPÓN DE DESCUENTO
     // =====================================
 
+
     fun setCoupon(
         code: String,
         discountCents: Long
@@ -189,14 +190,41 @@ class CheckoutViewModel : ViewModel() {
             "El descuento no puede ser negativo."
         }
 
+        val normalizedCode = code.trim().uppercase()
+
         _uiState.update {
             it.copy(
-                couponCode =
-                    code.trim().takeIf(String::isNotBlank),
+                couponCode = normalizedCode.takeIf {
+                        value -> value.isNotBlank()
+                },
                 discountCents = discountCents
             )
         }
     }
+
+    /**
+     * Recalcula el descuento cuando cambia
+     * el subtotal del carrito.
+     */
+    fun updateCartSubtotal(subtotalCents: Long) {
+        _uiState.update { current ->
+
+            val updatedDiscount =
+                CouponPricing.calculateDiscount(
+                    couponCode = current.couponCode,
+                    subtotalCents = subtotalCents
+                )
+
+            if (current.discountCents == updatedDiscount) {
+                current
+            } else {
+                current.copy(
+                    discountCents = updatedDiscount
+                )
+            }
+        }
+    }
+
 
     fun removeCoupon() {
         _uiState.update {

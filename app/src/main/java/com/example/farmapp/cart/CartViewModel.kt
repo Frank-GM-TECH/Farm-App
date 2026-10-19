@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
  *
  * Los montos se almacenan en centimos.
  */
+
 data class CartUiState(
     val items: List<CartItem> = emptyList(),
     val totalUnits: Int = 0,
@@ -30,7 +31,18 @@ data class CartUiState(
     val isLoading: Boolean = true,
     val isWorking: Boolean = false,
     val message: String? = null
-)
+) {
+    val unavailableItems: List<CartItem>
+        get() = items.filter {
+            it.availabilityMessage != null
+        }
+
+    val canCheckout: Boolean
+        get() = !isLoading &&
+                !isWorking &&
+                items.isNotEmpty() &&
+                unavailableItems.isEmpty()
+}
 
 /**
  * HU04 - ViewModel del carrito de FarmApp.

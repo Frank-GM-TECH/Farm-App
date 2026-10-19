@@ -138,15 +138,29 @@ fun FarmAppOrderDetailScreen(
                                 orderUiState.invoiceValid
                         )
 
+
+    // HU04 - B4.2.5:
+    // Detectar productos no disponibles
+    // mientras el usuario está en el checkout.
+    val unavailableItems =
+        cartUiState.items.filter {
+            it.availabilityMessage != null
+        }
+
+    val hasUnavailableItems =
+        unavailableItems.isNotEmpty()
+
     val canConfirm =
         cartUiState.items.isNotEmpty() &&
                 !cartUiState.isLoading &&
                 !cartUiState.isWorking &&
                 !orderUiState.isProcessing &&
+                !hasUnavailableItems &&
                 hasDeliverySelection &&
                 !orderUiState.paymentMethod.isNullOrBlank() &&
                 hasReceipt &&
                 validDiscount
+
 
     Scaffold(
         modifier = modifier.testTag("order_detail_screen"),
@@ -200,6 +214,21 @@ fun FarmAppOrderDetailScreen(
                         amount = total,
                         emphasized = true
                     )
+
+
+                    if (hasUnavailableItems) {
+                        Text(
+                            text = "No puedes confirmar este pedido. " +
+                                    "Hay productos agotados, desactivados " +
+                                    "o con stock insuficiente. " +
+                                    "Regresa al carrito para corregirlos.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.testTag(
+                                "order_unavailable_products_warning"
+                            )
+                        )
+                    }
 
                     Button(
                         onClick = onConfirmOrder,

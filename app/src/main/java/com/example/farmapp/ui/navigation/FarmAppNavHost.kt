@@ -85,6 +85,16 @@ fun FarmAppNavHost(
     val checkoutViewModel: CheckoutViewModel = viewModel()
     val orderUiState by checkoutViewModel.uiState.collectAsStateWithLifecycle()
 
+    // HU04 - B4.2.4: sincronizar el subtotal y el descuento.
+    LaunchedEffect(
+        checkoutViewModel,
+        cartUiState.subtotalCents
+    ) {
+        checkoutViewModel.updateCartSubtotal(
+            cartUiState.subtotalCents
+        )
+    }
+
     // El borrador no debe conservarse al cerrar la sesion.
     LaunchedEffect(uiState.isAuthenticated) {
         if (!uiState.isAuthenticated) checkoutViewModel.resetCheckout()

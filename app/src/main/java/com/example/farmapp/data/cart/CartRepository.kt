@@ -3,7 +3,7 @@ package com.example.farmapp.data.cart
 import com.example.farmapp.data.catalog.CatalogProductRepository
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 
 /**
  * HU04 - Contrato del carrito de compras.
@@ -58,17 +58,75 @@ class OfflineCartRepository(
         }
     }
 
+
     override fun observeCart(
         userId: String
     ): Flow<List<CartItem>> {
 
         requireCurrentUser(userId)
 
-        return dao.observeCart(userId).map { entities ->
+        return combine(
+            dao.observeCart(userId),
+            catalogRepository.products
+        ) { cartEntities, catalogProducts ->
+
             requireCurrentUser(userId)
-            entities.map { it.toCartItem() }
+
+            val productsBySku =
+                catalogProducts.associateBy { it.sku }
+
+            cartEntities.map { entity ->
+
+                val currentProduct =
+                    productsBySku[entity.sku]
+
+                val isAvailable =
+                    currentProduct != null &&
+                            currentProduct.active &&
+                            currentProduct.stock >= entity.quantity
+
+                val hasNewPrice =
+                    currentProduct != null &&
+                            currentProduct.priceCents !=
+                            entity.unitPriceCents
+
+                if (!isAvailable || hasNewPrice) {
+                    android.util.Log.d(
+                        "FarmAppCartSync",
+                        "Revisar producto: ${entity.sku}"
+                    )
+                }
+
+
+                val availabilityMessage = when {
+                    currentProduct == null ->
+                        "Producto no disponible en el catálogo."
+
+                    !currentProduct.active ->
+                        "Este producto fue desactivado."
+
+                    currentProduct.stock == 0 ->
+                        "Producto agotado."
+
+                    currentProduct.stock < entity.quantity ->
+                        "Stock insuficiente. Disponible: ${currentProduct.stock}."
+
+                    else -> null
+                }
+
+                entity.toCartItem().copy(
+                    name = currentProduct?.name ?: entity.name,
+                    imageUrl = currentProduct?.imageUrl ?: entity.imageUrl,
+                    unitPriceCents =
+                        currentProduct?.priceCents ?: entity.unitPriceCents,
+                    priceChanged = hasNewPrice,
+                    availabilityMessage = availabilityMessage
+                )
+
+            }
         }
     }
+
 
     override suspend fun addProduct(
         userId: String,

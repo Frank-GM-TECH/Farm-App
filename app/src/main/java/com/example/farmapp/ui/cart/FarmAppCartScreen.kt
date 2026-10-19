@@ -393,6 +393,22 @@ private fun CartProductCard(
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
+
+                    if (item.priceChanged) {
+                        Text(
+                            text = "Precio actualizado según el catálogo.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    item.availabilityMessage?.let { warning ->
+                        Text(
+                            text = warning,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
                 }
             }
 
@@ -587,10 +603,24 @@ private fun CartSummaryPanel(
                 )
             }
 
+
+            if (uiState.unavailableItems.isNotEmpty()) {
+                Text(
+                    text = "No puedes continuar: " +
+                            "hay productos agotados, desactivados " +
+                            "o con stock insuficiente. " +
+                            "Revisa las cantidades o elimínalos.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.testTag(
+                        "cart_checkout_blocked_warning"
+                    )
+                )
+            }
+
             Button(
                 onClick = onCheckout,
-                enabled = !uiState.isWorking &&
-                        uiState.items.isNotEmpty(),
+                enabled = uiState.canCheckout,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(54.dp)
