@@ -14,6 +14,7 @@ object FarmAppDestinations {
     const val ORDER_DETAIL = "order_detail"
     // HU04 - Selección de botica.
     const val PICKUP_STORE = "pickup_store"
+    const val DELIVERY_ADDRESS = "delivery_address"
     const val PROFILE = "profile"
     const val REMOTE_GALLERY = "remote_gallery"
     const val SQL_LAB = "sql_lab"

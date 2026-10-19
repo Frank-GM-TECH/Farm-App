@@ -46,6 +46,7 @@ import com.example.farmapp.ui.room.RoomDemoEditRoute
 import com.example.farmapp.ui.room.RoomDemoRoute
 import com.example.farmapp.ui.scanner.FarmAppBarcodeScannerScreen
 import com.example.farmapp.ui.sql.SqlLabRoute
+import com.example.farmapp.ui.checkout.FarmAppDeliveryAddressScreen
 
 /**
  * HU04 - Paso 8: carrito, detalle de pedido y seleccion de botica.
@@ -347,11 +348,9 @@ fun FarmAppNavHost(
                         checkoutViewModel.selectDeliveryMethod(method)
                     },
                     onOpenAddress = {
-                        Toast.makeText(
-                            context,
-                            "Agregar dirección: próximamente",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        navController.navigate(FarmAppDestinations.DELIVERY_ADDRESS) {
+                            launchSingleTop = true
+                        }
                     },
                     onChoosePickupStore = {
                         navController.navigate(FarmAppDestinations.PICKUP_STORE) {
@@ -396,7 +395,18 @@ fun FarmAppNavHost(
                 )
             }
         }
-
+        composable(FarmAppDestinations.DELIVERY_ADDRESS) {
+            if (uiState.isAuthenticated) {
+                FarmAppDeliveryAddressScreen(
+                    currentAddress = orderUiState.deliveryAddress.orEmpty(),
+                    onBack = { navController.popBackStack() },
+                    onSave = { address ->
+                        checkoutViewModel.setDeliveryAddress(address)
+                        navController.popBackStack()
+                    }
+                )
+            }
+        }
         // HU04: seleccionar una botica de demostracion para recoger el pedido.
         composable(FarmAppDestinations.PICKUP_STORE) {
             if (uiState.isAuthenticated) {
