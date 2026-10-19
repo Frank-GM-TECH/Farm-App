@@ -19,6 +19,8 @@ object FarmAppDestinations {
     const val PAYMENT_METHOD = "payment_method"
     // HU04 - Paso 11: Comprobante.
     const val RECEIPT = "receipt"
+    // HU04 - Paso 12: Cupon de descuento.
+    const val COUPON = "coupon"
     const val PROFILE = "profile"
     const val REMOTE_GALLERY = "remote_gallery"
     const val SQL_LAB = "sql_lab"

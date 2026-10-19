@@ -49,6 +49,7 @@ import com.example.farmapp.ui.scanner.FarmAppBarcodeScannerScreen
 import com.example.farmapp.ui.sql.SqlLabRoute
 import com.example.farmapp.ui.checkout.FarmAppDeliveryAddressScreen
 import com.example.farmapp.ui.checkout.FarmAppReceiptScreen
+import com.example.farmapp.ui.checkout.FarmAppCouponScreen
 
 /**
  * HU04 - Paso 8: carrito, detalle de pedido y seleccion de botica.
@@ -378,11 +379,9 @@ fun FarmAppNavHost(
                         }
                     },
                     onOpenCoupon = {
-                        Toast.makeText(
-                            context,
-                            "Cupones de descuento: próximamente",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        navController.navigate(FarmAppDestinations.COUPON) {
+                            launchSingleTop = true
+                        }
                     },
                     onConfirmOrder = {
                         // En el paso 7 no se generan pedidos ni se cobran tarjetas.
@@ -391,6 +390,27 @@ fun FarmAppNavHost(
                             "La confirmación estará disponible al completar el checkout.",
                             Toast.LENGTH_LONG
                         ).show()
+                    }
+                )
+            }
+        }
+
+        // HU04 - Paso 12: Cupones.
+        composable(FarmAppDestinations.COUPON) {
+            if (uiState.isAuthenticated) {
+                FarmAppCouponScreen(
+                    currentCode = orderUiState.couponCode,
+                    subtotalCents = cartUiState.subtotalCents,
+                    onBack = {
+                        navController.popBackStack()
+                    },
+                    onApply = { code, discount ->
+                        checkoutViewModel.setCoupon(code, discount)
+                        navController.popBackStack()
+                    },
+                    onRemove = {
+                        checkoutViewModel.removeCoupon()
+                        navController.popBackStack()
                     }
                 )
             }
