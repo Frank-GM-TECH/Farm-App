@@ -24,14 +24,19 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.farmapp.R
 import com.example.farmapp.auth.AuthUiState
+import com.example.farmapp.cart.CartViewModel
 import com.example.farmapp.catalog.CatalogProductViewModel
 import com.example.farmapp.catalog.DemoCatalogData
 import com.example.farmapp.catalog.DemoProduct
+import com.example.farmapp.checkout.CheckoutViewModel
 import com.example.farmapp.data.preferences.GalleryLayoutPreference
 import com.example.farmapp.profile.ProfileRoute
 import com.example.farmapp.ui.account.FarmAppAccountScreen
 import com.example.farmapp.ui.auth.AuthScreen
 import com.example.farmapp.ui.background.InventoryReportRoute
+import com.example.farmapp.ui.cart.FarmAppCartScreen
+import com.example.farmapp.ui.checkout.FarmAppOrderDetailScreen
+import com.example.farmapp.ui.checkout.FarmAppPickupStoreScreen
 import com.example.farmapp.ui.catalog.FarmAppCategoriesScreen
 import com.example.farmapp.ui.catalog.RemoteProductGalleryRoute
 import com.example.farmapp.ui.home.FarmAppStoreHomeScreen
@@ -39,13 +44,12 @@ import com.example.farmapp.ui.legacy.LegacyInventoryActivity
 import com.example.farmapp.ui.room.RoomDemoDetailRoute
 import com.example.farmapp.ui.room.RoomDemoEditRoute
 import com.example.farmapp.ui.room.RoomDemoRoute
-import com.example.farmapp.ui.sql.SqlLabRoute
 import com.example.farmapp.ui.scanner.FarmAppBarcodeScannerScreen
+import com.example.farmapp.ui.sql.SqlLabRoute
 
 /**
- * HU03, paso 27: Inicio, Categorias, Cuenta y escaner con busqueda en Room.
- * Se conserva el catalogo educativo en CATALOG, ademas de HU01/HU02
- * y las pantallas de laboratorio existentes.
+ * HU04 - Paso 8: carrito, detalle de pedido y seleccion de botica.
+ * Conserva HU01, HU02, HU03, escaner y los laboratorios educativos.
  */
 @Composable
 fun FarmAppNavHost(
@@ -69,6 +73,19 @@ fun FarmAppNavHost(
     val chooserTitle = stringResource(R.string.nav_share_chooser_title)
     val shareLabel = stringResource(R.string.nav_share_message)
 
+    // HU04: un solo ViewModel para toda la navegacion.
+    val cartViewModel: CartViewModel = viewModel(factory = CartViewModel.Factory)
+    val cartUiState by cartViewModel.uiState.collectAsStateWithLifecycle()
+
+    // HU04: estado del borrador de compra compartido entre rutas.
+    val checkoutViewModel: CheckoutViewModel = viewModel()
+    val orderUiState by checkoutViewModel.uiState.collectAsStateWithLifecycle()
+
+    // El borrador no debe conservarse al cerrar la sesion.
+    LaunchedEffect(uiState.isAuthenticated) {
+        if (!uiState.isAuthenticated) checkoutViewModel.resetCheckout()
+    }
+
     val share: (DemoProduct) -> Unit = onShareProduct ?: { product ->
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
@@ -77,7 +94,7 @@ fun FarmAppNavHost(
         context.startActivity(Intent.createChooser(intent, chooserTitle))
     }
 
-    // HU01: seleccion del destino inicial segun la sesion.
+    // HU01: conservar transiciones seguras entre sesion y autenticacion.
     val initialDestination = remember {
         if (uiState.isAuthenticated) FarmAppDestinations.HOME
         else FarmAppDestinations.AUTH
@@ -85,7 +102,6 @@ fun FarmAppNavHost(
     var lastAuthenticated by rememberSaveable {
         mutableStateOf(uiState.isAuthenticated)
     }
-
     LaunchedEffect(uiState.isAuthenticated) {
         if (lastAuthenticated != uiState.isAuthenticated) {
             val target = if (uiState.isAuthenticated) {
@@ -103,7 +119,6 @@ fun FarmAppNavHost(
 
     val navigateTopLevel: (String) -> Unit = { destination ->
         if (navController.currentDestination?.route != destination) {
-            // Compatibilidad con el regreso del detalle educativo.
             val returningToCatalog =
                 destination == FarmAppDestinations.CATALOG &&
                         navController.currentDestination?.route == FarmAppDestinations.PRODUCT &&
@@ -136,7 +151,7 @@ fun FarmAppNavHost(
             )
         }
 
-        // HU03: inicio comercial con productos disponibles de Room.
+        // HU03/HU04: Inicio comercial y boton Agregar al carrito.
         composable(FarmAppDestinations.HOME) {
             if (uiState.isAuthenticated) {
                 val catalogViewModel: CatalogProductViewModel =
@@ -146,15 +161,9 @@ fun FarmAppNavHost(
                 FarmAppAdaptiveNavigation(
                     widthSizeClass = windowWidthSizeClass,
                     selectedDestination = FarmAppDestinations.HOME,
-                    onNavigateHome = {
-                        navigateTopLevel(FarmAppDestinations.HOME)
-                    },
-                    onNavigateCatalog = {
-                        navigateTopLevel(FarmAppDestinations.CATEGORIES)
-                    },
-                    onNavigateAccount = {
-                        navigateTopLevel(FarmAppDestinations.ACCOUNT)
-                    },
+                    onNavigateHome = { navigateTopLevel(FarmAppDestinations.HOME) },
+                    onNavigateCatalog = { navigateTopLevel(FarmAppDestinations.CATEGORIES) },
+                    onNavigateAccount = { navigateTopLevel(FarmAppDestinations.ACCOUNT) },
                     modifier = Modifier.fillMaxSize()
                 ) {
                     FarmAppStoreHomeScreen(
@@ -163,49 +172,46 @@ fun FarmAppNavHost(
                         onOpenAddress = {
                             Toast.makeText(
                                 context,
-                                "La seleccion de direccion estara disponible proximamente.",
+                                "La selección de dirección estará disponible próximamente.",
                                 Toast.LENGTH_SHORT
                             ).show()
                         },
                         onOpenDelivery = {
                             Toast.makeText(
                                 context,
-                                "Delivery estara disponible proximamente.",
+                                "Delivery estará disponible próximamente.",
                                 Toast.LENGTH_SHORT
                             ).show()
                         },
                         onOpenCart = {
-                            Toast.makeText(
-                                context,
-                                "El carrito estara disponible proximamente.",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+                            navController.navigate(FarmAppDestinations.CART) {
+                                launchSingleTop = true
+                            }
+                        },
+                        onAddToCart = { product ->
+                            cartViewModel.addProduct(sku = product.sku, quantity = 1)
+                        },
+                        cartItemCount = cartUiState.totalUnits
                     )
                 }
             }
         }
 
-        // HU03: categorias comerciales, con busqueda y filtros de Room.
+        // HU03/HU04: Categorias con filtros, escaner y carrito.
         composable(FarmAppDestinations.CATEGORIES) { categoryEntry ->
             if (uiState.isAuthenticated) {
                 val catalogViewModel: CatalogProductViewModel =
                     viewModel(factory = CatalogProductViewModel.Factory)
                 val categoriesUiState by catalogViewModel.uiState.collectAsStateWithLifecycle()
 
-                // El escaner deposita el codigo en el SavedStateHandle de Categorias.
-                // Recuperamos el evento al volver desde la camara.
                 val scannedBarcode by categoryEntry.savedStateHandle
                     .getStateFlow<String?>("scanned_barcode", null)
                     .collectAsStateWithLifecycle()
 
                 LaunchedEffect(scannedBarcode) {
                     scannedBarcode?.let { barcode ->
-                        // Eliminar filtros que pudieran ocultar el producto.
                         catalogViewModel.onCategorySelected(null)
-                        // El ViewModel ya busca por nombre, SKU y codigo de barras.
                         catalogViewModel.onQueryChanged(barcode)
-                        // Consumir el evento para que no se repita en recomposiciones.
                         categoryEntry.savedStateHandle["scanned_barcode"] = null
                     }
                 }
@@ -213,15 +219,9 @@ fun FarmAppNavHost(
                 FarmAppAdaptiveNavigation(
                     widthSizeClass = windowWidthSizeClass,
                     selectedDestination = FarmAppDestinations.CATEGORIES,
-                    onNavigateHome = {
-                        navigateTopLevel(FarmAppDestinations.HOME)
-                    },
-                    onNavigateCatalog = {
-                        navigateTopLevel(FarmAppDestinations.CATEGORIES)
-                    },
-                    onNavigateAccount = {
-                        navigateTopLevel(FarmAppDestinations.ACCOUNT)
-                    },
+                    onNavigateHome = { navigateTopLevel(FarmAppDestinations.HOME) },
+                    onNavigateCatalog = { navigateTopLevel(FarmAppDestinations.CATEGORIES) },
+                    onNavigateAccount = { navigateTopLevel(FarmAppDestinations.ACCOUNT) },
                     modifier = Modifier.fillMaxSize()
                 ) {
                     FarmAppCategoriesScreen(
@@ -232,59 +232,54 @@ fun FarmAppNavHost(
                             navController.navigate(FarmAppDestinations.BARCODE_SCANNER) {
                                 launchSingleTop = true
                             }
-                        }
+                        },
+                        onAddToCart = { product ->
+                            cartViewModel.addProduct(sku = product.sku, quantity = 1)
+                        },
+                        onOpenCart = {
+                            navController.navigate(FarmAppDestinations.CART) {
+                                launchSingleTop = true
+                            }
+                        },
+                        cartItemCount = cartUiState.totalUnits
                     )
                 }
             }
         }
 
-        // HU03: nueva pantalla comercial de Cuenta.
+        // HU03: Cuenta, Perfil y herramientas anteriores.
         composable(FarmAppDestinations.ACCOUNT) {
             if (uiState.isAuthenticated) {
                 FarmAppAdaptiveNavigation(
                     widthSizeClass = windowWidthSizeClass,
                     selectedDestination = FarmAppDestinations.ACCOUNT,
-                    onNavigateHome = {
-                        navigateTopLevel(FarmAppDestinations.HOME)
-                    },
-                    onNavigateCatalog = {
-                        navigateTopLevel(FarmAppDestinations.CATEGORIES)
-                    },
-                    onNavigateAccount = {
-                        navigateTopLevel(FarmAppDestinations.ACCOUNT)
-                    },
+                    onNavigateHome = { navigateTopLevel(FarmAppDestinations.HOME) },
+                    onNavigateCatalog = { navigateTopLevel(FarmAppDestinations.CATEGORIES) },
+                    onNavigateAccount = { navigateTopLevel(FarmAppDestinations.ACCOUNT) },
                     modifier = Modifier.fillMaxSize()
                 ) {
                     FarmAppAccountScreen(
                         email = uiState.userEmail
                             ?.takeIf(String::isNotBlank)
                             ?: stringResource(R.string.home_email_unknown),
-                        // HU02: perfil completo y fotografia.
                         onOpenProfile = {
                             navController.navigate(FarmAppDestinations.PROFILE) {
                                 launchSingleTop = true
                             }
                         },
-                        // Futuras funciones: aun no se almacenan pedidos,
-                        // favoritos ni direcciones en el modulo comercial.
                         onOpenOrders = {
-                            Toast.makeText(
-                                context, "Mis pedidos: proximamente", Toast.LENGTH_SHORT
-                            ).show()
+                            Toast.makeText(context, "Mis pedidos: próximamente", Toast.LENGTH_SHORT)
+                                .show()
                         },
                         onOpenFavorites = {
-                            Toast.makeText(
-                                context, "Mis favoritos: proximamente", Toast.LENGTH_SHORT
-                            ).show()
+                            Toast.makeText(context, "Mis favoritos: próximamente", Toast.LENGTH_SHORT)
+                                .show()
                         },
                         onOpenAddresses = {
-                            Toast.makeText(
-                                context, "Mis direcciones: proximamente", Toast.LENGTH_SHORT
-                            ).show()
+                            Toast.makeText(context, "Mis direcciones: próximamente", Toast.LENGTH_SHORT)
+                                .show()
                         },
-                        // HU01: cierre de sesion existente.
                         onSignOut = onSignOut,
-                        // Conservar catalogo educativo y laboratorios.
                         onOpenCatalog = {
                             navController.navigate(FarmAppDestinations.CATALOG)
                         },
@@ -307,51 +302,149 @@ fun FarmAppNavHost(
             }
         }
 
-        // HU03: escaner de codigos de barras (CameraX + ML Kit).
-        composable(FarmAppDestinations.BARCODE_SCANNER) {
+        // HU04: Mi carrito, cantidades y resumen desplegable.
+        composable(FarmAppDestinations.CART) {
             if (uiState.isAuthenticated) {
-                FarmAppBarcodeScannerScreen(
+                FarmAppCartScreen(
+                    uiState = cartUiState,
                     onBack = { navController.popBackStack() },
-                    onBarcodeScanned = { barcode ->
-                        // Guardar el resultado en Categorias antes de regresar.
-                        navController.previousBackStackEntry
-                            ?.savedStateHandle
-                            ?.set("scanned_barcode", barcode)
+                    onContinueShopping = {
+                        navigateTopLevel(FarmAppDestinations.HOME)
+                    },
+                    onOpenFavorites = {
+                        Toast.makeText(context, "Mis favoritos: próximamente", Toast.LENGTH_SHORT)
+                            .show()
+                    },
+                    onIncreaseQuantity = { item ->
+                        if (item.quantity < Int.MAX_VALUE) {
+                            cartViewModel.changeQuantity(item.sku, item.quantity + 1)
+                        }
+                    },
+                    onDecreaseQuantity = { item ->
+                        cartViewModel.changeQuantity(item.sku, item.quantity - 1)
+                    },
+                    onRemoveProduct = { item ->
+                        cartViewModel.removeProduct(item.sku)
+                    },
+                    onCheckout = {
+                        navController.navigate(FarmAppDestinations.ORDER_DETAIL) {
+                            launchSingleTop = true
+                        }
+                    },
+                    onDismissMessage = { cartViewModel.clearMessage() }
+                )
+            }
+        }
 
+        // HU04: detalle del pedido (checkout de demostracion, sin cobrar).
+        composable(FarmAppDestinations.ORDER_DETAIL) {
+            if (uiState.isAuthenticated) {
+                FarmAppOrderDetailScreen(
+                    cartUiState = cartUiState,
+                    orderUiState = orderUiState,
+                    onBack = { navController.popBackStack() },
+                    onDeliveryMethodSelected = { method ->
+                        checkoutViewModel.selectDeliveryMethod(method)
+                    },
+                    onOpenAddress = {
                         Toast.makeText(
                             context,
-                            "Codigo detectado: $barcode",
+                            "Agregar dirección: próximamente",
                             Toast.LENGTH_SHORT
                         ).show()
+                    },
+                    onChoosePickupStore = {
+                        navController.navigate(FarmAppDestinations.PICKUP_STORE) {
+                            launchSingleTop = true
+                        }
+                    },
+                    onPickupRecipientSelected = { recipient ->
+                        checkoutViewModel.selectPickupRecipient(recipient)
+                    },
+                    onOtherRecipientNameChanged = { name ->
+                        checkoutViewModel.setOtherRecipientName(name)
+                    },
+                    onOpenPaymentMethod = {
+                        Toast.makeText(
+                            context,
+                            "Métodos de pago: próximamente",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    },
+                    onOpenReceipt = {
+                        Toast.makeText(
+                            context,
+                            "Comprobantes de pago: próximamente",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    },
+                    onOpenCoupon = {
+                        Toast.makeText(
+                            context,
+                            "Cupones de descuento: próximamente",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    },
+                    onConfirmOrder = {
+                        // En el paso 7 no se generan pedidos ni se cobran tarjetas.
+                        Toast.makeText(
+                            context,
+                            "La confirmación estará disponible al completar el checkout.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                )
+            }
+        }
 
+        // HU04: seleccionar una botica de demostracion para recoger el pedido.
+        composable(FarmAppDestinations.PICKUP_STORE) {
+            if (uiState.isAuthenticated) {
+                FarmAppPickupStoreScreen(
+                    selectedStoreId = orderUiState.pickupStore?.id,
+                    onBack = { navController.popBackStack() },
+                    onStoreSelected = { store ->
+                        // Actualiza el borrador compartido antes de volver al pedido.
+                        checkoutViewModel.setPickupStore(store)
                         navController.popBackStack()
                     }
                 )
             }
         }
 
-        // HU02: perfil.
+        // HU03: CameraX + ML Kit; entrega el codigo a Categorias.
+        composable(FarmAppDestinations.BARCODE_SCANNER) {
+            if (uiState.isAuthenticated) {
+                FarmAppBarcodeScannerScreen(
+                    onBack = { navController.popBackStack() },
+                    onBarcodeScanned = { barcode ->
+                        navController.previousBackStackEntry
+                            ?.savedStateHandle?.set("scanned_barcode", barcode)
+                        Toast.makeText(
+                            context, "Código detectado: $barcode", Toast.LENGTH_SHORT
+                        ).show()
+                        navController.popBackStack()
+                    }
+                )
+            }
+        }
+
+        // HU02: Mi perfil.
         composable(FarmAppDestinations.PROFILE) {
             if (uiState.isAuthenticated) {
                 ProfileRoute(onBack = { navController.popBackStack() })
             }
         }
 
-        // Catalogo educativo original: se conserva en su propia ruta.
+        // HU01-HU03: catalogo educativo original.
         composable(FarmAppDestinations.CATALOG) {
             if (uiState.isAuthenticated) {
                 FarmAppAdaptiveNavigation(
                     widthSizeClass = windowWidthSizeClass,
                     selectedDestination = FarmAppDestinations.CATALOG,
-                    onNavigateHome = {
-                        navigateTopLevel(FarmAppDestinations.HOME)
-                    },
-                    onNavigateCatalog = {
-                        navigateTopLevel(FarmAppDestinations.CATEGORIES)
-                    },
-                    onNavigateAccount = {
-                        navigateTopLevel(FarmAppDestinations.ACCOUNT)
-                    },
+                    onNavigateHome = { navigateTopLevel(FarmAppDestinations.HOME) },
+                    onNavigateCatalog = { navigateTopLevel(FarmAppDestinations.CATEGORIES) },
+                    onNavigateAccount = { navigateTopLevel(FarmAppDestinations.ACCOUNT) },
                     modifier = Modifier.fillMaxSize()
                 ) {
                     CatalogRouteScreen(
@@ -370,7 +463,7 @@ fun FarmAppNavHost(
             }
         }
 
-        // Reportes de segundo plano.
+        // Informes de segundo plano.
         composable(FarmAppDestinations.BACKGROUND_REPORT) {
             if (uiState.isAuthenticated) {
                 InventoryReportRoute(onBack = { navController.popBackStack() })
@@ -396,7 +489,7 @@ fun FarmAppNavHost(
             }
         }
 
-        // Detalle de un articulo Room.
+        // Detalle del laboratorio Room.
         composable(
             route = FarmAppDestinations.ROOM_ITEM_DETAIL,
             arguments = listOf(
@@ -417,7 +510,7 @@ fun FarmAppNavHost(
             }
         }
 
-        // Edicion Room.
+        // Edicion del laboratorio Room.
         composable(
             route = FarmAppDestinations.ROOM_ITEM_EDIT,
             arguments = listOf(
@@ -431,7 +524,7 @@ fun FarmAppNavHost(
             }
         }
 
-        // Galeria remota de demostracion.
+        // Galeria remota educativa.
         composable(FarmAppDestinations.REMOTE_GALLERY) {
             if (uiState.isAuthenticated) {
                 RemoteProductGalleryRoute(
@@ -461,15 +554,9 @@ fun FarmAppNavHost(
                 FarmAppAdaptiveNavigation(
                     widthSizeClass = windowWidthSizeClass,
                     selectedDestination = FarmAppDestinations.CATALOG,
-                    onNavigateHome = {
-                        navigateTopLevel(FarmAppDestinations.HOME)
-                    },
-                    onNavigateCatalog = {
-                        navigateTopLevel(FarmAppDestinations.CATEGORIES)
-                    },
-                    onNavigateAccount = {
-                        navigateTopLevel(FarmAppDestinations.ACCOUNT)
-                    },
+                    onNavigateHome = { navigateTopLevel(FarmAppDestinations.HOME) },
+                    onNavigateCatalog = { navigateTopLevel(FarmAppDestinations.CATEGORIES) },
+                    onNavigateAccount = { navigateTopLevel(FarmAppDestinations.ACCOUNT) },
                     modifier = Modifier.fillMaxSize()
                 ) {
                     ProductDetailScreen(

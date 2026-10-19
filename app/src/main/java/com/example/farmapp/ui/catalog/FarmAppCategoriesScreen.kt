@@ -30,6 +30,10 @@ import androidx.compose.ui.unit.dp
 import com.example.farmapp.catalog.CatalogProductUiState
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import com.example.farmapp.data.catalog.CatalogProductEntity
 
 /**
  * HU03 - Pantalla comercial de Categorías.
@@ -43,13 +47,17 @@ import androidx.compose.material3.IconButton
  * - Productos con imagen, precio y stock
  * - Estados de carga, error y lista vacía
  */
+
 @Composable
 fun FarmAppCategoriesScreen(
     uiState: CatalogProductUiState,
     onQueryChanged: (String) -> Unit,
     onCategorySelected: (String?) -> Unit,
     onOpenScanner: () -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onAddToCart: ((CatalogProductEntity) -> Unit)? = null,
+    onOpenCart: (() -> Unit)? = null,
+    cartItemCount: Int = 0
 ) {
     Column(
         modifier = modifier
@@ -75,16 +83,48 @@ fun FarmAppCategoriesScreen(
                 style = MaterialTheme.typography.headlineMedium
             )
 
-            IconButton(
-                onClick = onOpenScanner,
-                modifier = Modifier.testTag("categories_open_scanner")
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Filled.QrCodeScanner,
-                    contentDescription = "Escanear código de barras",
-                    tint = MaterialTheme.colorScheme.primary
-                )
+
+                // Escáner HU03: se conserva.
+                IconButton(
+                    onClick = onOpenScanner,
+                    modifier = Modifier.testTag("categories_open_scanner")
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.QrCodeScanner,
+                        contentDescription = "Escanear código de barras",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
+
+                // Carrito HU04.
+                if (onOpenCart != null) {
+
+                    IconButton(
+                        onClick = onOpenCart,
+                        modifier = Modifier.testTag("categories_open_cart")
+                    ) {
+                        BadgedBox(
+                            badge = {
+                                if (cartItemCount > 0) {
+                                    Badge {
+                                        Text(cartItemCount.toString())
+                                    }
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.ShoppingCart,
+                                contentDescription = "Mi carrito"
+                            )
+                        }
+                    }
+                }
             }
+
         }
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -282,7 +322,8 @@ fun FarmAppCategoriesScreen(
                     ) { product ->
 
                         CatalogProductCard(
-                            product = product
+                            product = product,
+                            onAddToCart = onAddToCart
                         )
                     }
                 }

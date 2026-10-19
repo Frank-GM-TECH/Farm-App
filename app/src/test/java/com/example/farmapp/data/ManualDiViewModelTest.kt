@@ -10,8 +10,11 @@ import com.example.farmapp.catalog.InMemoryCatalogRepository
 import com.example.farmapp.data.background.InventoryReportRepository
 import com.example.farmapp.data.background.ReportWorkUiState
 
-// HU03 - Repositorio del catálogo persistente.
+// HU03 - Repositorio del catalogo persistente.
 import com.example.farmapp.data.catalog.CatalogProductRepository
+
+// HU04 - Repositorio del carrito offline.
+import com.example.farmapp.data.cart.CartRepository
 
 import com.example.farmapp.data.preferences.UserPreferencesRepository
 
@@ -44,12 +47,16 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * C22 - Pruebas de inyección manual de dependencias.
+ * Pruebas de inyeccion manual de dependencias.
  *
  * Utiliza implementaciones falsas para evitar
  * conexiones reales con Firebase, Retrofit y Room.
  *
- * Compatible con HU01, HU02 y HU03.
+ * Compatible con:
+ * HU01 - Autenticacion.
+ * HU02 - Perfiles.
+ * HU03 - Catalogo.
+ * HU04 - Carrito offline.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class ManualDiViewModelTest {
@@ -58,11 +65,13 @@ class ManualDiViewModelTest {
     val main = MainDispatcherRule()
 
     /**
-     * Contenedor falso para las pruebas unitarias.
+     * Contenedor falso para pruebas unitarias.
      *
-     * Solo necesitamos simular el repositorio remoto.
-     * Las demás dependencias implementan los contratos
-     * de AppContainer.
+     * Solo simulamos el repositorio remoto
+     * que se utiliza directamente en estas pruebas.
+     *
+     * Las demas propiedades se mantienen
+     * para cumplir el contrato AppContainer.
      */
     private class FakeAppContainer(
         override val remoteProductsRepository: RemoteProductsRepository
@@ -78,12 +87,21 @@ class ManualDiViewModelTest {
             )
 
         // =========================================
-        // HU03 - REPOSITORIO DE CATÁLOGO ROOM
+        // HU03 - REPOSITORIO DE CATALOGO ROOM
         // =========================================
 
         override val catalogProductRepository: CatalogProductRepository
             get() = error(
-                "El catálogo Room no se utiliza en esta prueba"
+                "El catalogo Room no se utiliza en esta prueba"
+            )
+
+        // =========================================
+        // HU04 - REPOSITORIO DEL CARRITO ROOM
+        // =========================================
+
+        override val cartRepository: CartRepository
+            get() = error(
+                "El carrito HU04 no se utiliza en esta prueba"
             )
 
         // =========================================
@@ -163,6 +181,7 @@ class ManualDiViewModelTest {
                 override suspend fun runQuery(
                     query: SqlLabQuery
                 ): SqlLabResult {
+
                     return SqlLabResult.Products(emptyList())
                 }
 
@@ -176,7 +195,7 @@ class ManualDiViewModelTest {
             }
 
         // =========================================
-        // CATÁLOGO EDUCATIVO
+        // CATALOGO EDUCATIVO
         // =========================================
 
         override val catalogRepository:
@@ -184,7 +203,7 @@ class ManualDiViewModelTest {
             InMemoryCatalogRepository(emptyList())
 
         // =========================================
-        // HU01 - AUTENTICACIÓN
+        // HU01 - AUTENTICACION
         // =========================================
 
         override val authRepository: AuthRepository =
@@ -274,6 +293,7 @@ class ManualDiViewModelTest {
 
                     override suspend fun loadSkinCare():
                             List<RemoteProduct> {
+
                         throw IOException("sin conexion")
                     }
 

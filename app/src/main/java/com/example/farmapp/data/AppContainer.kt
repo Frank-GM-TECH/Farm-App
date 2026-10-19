@@ -3,53 +3,94 @@ package com.example.farmapp.data
 import android.content.Context
 import androidx.room.Room
 
-// HU01 - Autenticación.
+// =========================================
+// HU01 - AUTENTICACION
+// =========================================
+
 import com.example.farmapp.auth.AuthRepository
 import com.example.farmapp.auth.FirebaseAuthRepository
 
-// Catálogo educativo existente.
+// =========================================
+// CATALOGO EDUCATIVO EXISTENTE
+// =========================================
+
 import com.example.farmapp.catalog.CatalogRepository
 import com.example.farmapp.catalog.DemoCatalogData
 import com.example.farmapp.catalog.DemoProduct
 import com.example.farmapp.catalog.InMemoryCatalogRepository
 
-// HU03 - Catálogo persistente con Room.
+// =========================================
+// HU03 - CATALOGO PERSISTENTE CON ROOM
+// =========================================
+
 import com.example.farmapp.data.catalog.CatalogDatabase
 import com.example.farmapp.data.catalog.CatalogProductRepository
 import com.example.farmapp.data.catalog.OfflineCatalogProductRepository
 
-// Room educativo existente.
+// =========================================
+// HU04 - CARRITO OFFLINE CON ROOM
+// =========================================
+
+import com.example.farmapp.data.cart.CartDatabase
+import com.example.farmapp.data.cart.CartRepository
+import com.example.farmapp.data.cart.OfflineCartRepository
+
+// =========================================
+// ROOM EDUCATIVO EXISTENTE
+// =========================================
+
 import com.example.farmapp.data.room.RoomDemoDatabase
 import com.example.farmapp.data.room.RoomDemoRepository
 import com.example.farmapp.data.room.OfflineRoomDemoRepository
 
-// SQLite educativo existente.
+// =========================================
+// SQLITE EDUCATIVO EXISTENTE
+// =========================================
+
 import com.example.farmapp.data.sql.SqlLabDatabase
 import com.example.farmapp.data.sql.SqlLabRepository
 import com.example.farmapp.data.sql.SqliteSqlLabRepository
 
-// Preferencias.
+// =========================================
+// DATASTORE - PREFERENCIAS
+// =========================================
+
 import com.example.farmapp.data.preferences.UserPreferencesRepository
 import com.example.farmapp.data.preferences.createUserPreferencesRepository
 
-// WorkManager.
+// =========================================
+// WORKMANAGER
+// =========================================
+
 import com.example.farmapp.data.background.InventoryReportRepository
 import com.example.farmapp.data.background.WorkManagerInventoryReportRepository
 
-// Retrofit y servicios remotos.
+// =========================================
+// RETROFIT Y SERVICIOS REMOTOS
+// =========================================
+
 import com.example.farmapp.network.RemoteProductsRepository
 import com.example.farmapp.network.RemoteProductsService
 import com.example.farmapp.network.RetrofitRemoteProductsRepository
 
-// HU02 - Perfil de usuario.
+// =========================================
+// HU02 - PERFIL DE USUARIO
+// =========================================
+
 import com.example.farmapp.profile.ProfileRepository
 import com.example.farmapp.profile.FirestoreProfileRepository
 
-// Firebase.
+// =========================================
+// FIREBASE
+// =========================================
+
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-// Retrofit y serialización.
+// =========================================
+// RETROFIT Y SERIALIZACION
+// =========================================
+
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
@@ -59,38 +100,90 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 /**
  * Contenedor principal de dependencias de FarmApp.
  *
- * Permite sustituir repositorios reales por implementaciones
- * falsas durante las pruebas unitarias.
+ * Centraliza los repositorios utilizados por
+ * los ViewModels y las distintas pantallas.
+ *
+ * HU01: Autenticacion.
+ * HU02: Perfil.
+ * HU03: Catalogo persistente.
+ * HU04: Carrito de compras offline.
+ *
+ * Permite sustituir los repositorios reales
+ * por implementaciones falsas durante
+ * las pruebas unitarias.
  */
 interface AppContainer {
 
-    // Repositorios de funcionalidades existentes.
+    // =====================================
+    // SERVICIOS REMOTOS
+    // =====================================
+
     val remoteProductsRepository: RemoteProductsRepository
+
+    // =====================================
+    // CATALOGO EDUCATIVO
+    // =====================================
 
     val catalogRepository: CatalogRepository<DemoProduct>
 
+    // =====================================
+    // HU01 - AUTENTICACION
+    // =====================================
+
     val authRepository: AuthRepository
+
+    // =====================================
+    // LABORATORIO SQLITE
+    // =====================================
 
     val sqlLabRepository: SqlLabRepository
 
+    // =====================================
+    // LABORATORIO ROOM
+    // =====================================
+
     val roomDemoRepository: RoomDemoRepository
+
+    // =====================================
+    // DATASTORE
+    // =====================================
 
     val userPreferencesRepository: UserPreferencesRepository
 
+    // =====================================
+    // WORKMANAGER
+    // =====================================
+
     val inventoryReportRepository: InventoryReportRepository
 
-    // HU02 - Perfil de usuario.
+    // =====================================
+    // HU02 - PERFIL
+    // =====================================
+
     val profileRepository: ProfileRepository
 
-    // HU03 - Catálogo persistente.
+    // =====================================
+    // HU03 - CATALOGO CON ROOM
+    // =====================================
+
     val catalogProductRepository: CatalogProductRepository
+
+    // =====================================
+    // HU04 - CARRITO CON ROOM
+    // =====================================
+
+    val cartRepository: CartRepository
 }
 
 /**
- * Implementación real de las dependencias de FarmApp.
+ * Implementacion real del contenedor.
  *
- * Se utiliza inicialización lazy para evitar crear
- * recursos hasta que realmente sean necesarios.
+ * Utiliza inicializacion lazy para crear
+ * bases de datos y repositorios solamente
+ * cuando alguna funcionalidad los necesite.
+ *
+ * Esto evita inicializaciones innecesarias
+ * durante el inicio de la aplicacion.
  */
 class DefaultAppContainer(
     private val appContext: Context
@@ -101,20 +194,30 @@ class DefaultAppContainer(
     // =========================================
 
     override val profileRepository: ProfileRepository by lazy {
+
         FirestoreProfileRepository(
             FirebaseFirestore.getInstance()
         )
     }
 
     // =========================================
-    // HU03 - BASE DE DATOS LOCAL DEL CATÁLOGO
+    // HU03 - BASE DE DATOS DEL CATALOGO
     // =========================================
 
     /**
-     * Base de datos Room exclusiva para productos.
+     * Base de datos Room para los productos.
      *
-     * Se mantiene independiente de RoomDemoDatabase
-     * para no afectar las prácticas anteriores.
+     * Guarda:
+     * - SKU
+     * - Codigo de barras
+     * - Nombre
+     * - Categoria
+     * - Precio
+     * - Stock
+     * - Imagen
+     *
+     * Esta base no se modifica al incorporar
+     * el carrito de HU04.
      */
     private val catalogDatabase: CatalogDatabase by lazy {
 
@@ -126,8 +229,11 @@ class DefaultAppContainer(
     }
 
     /**
-     * Repositorio que permite consultar y guardar
-     * productos de manera local.
+     * Repositorio del catalogo HU03.
+     *
+     * Se utiliza tanto en Inicio y Categorias
+     * como para validar los productos
+     * agregados al carrito.
      */
     override val catalogProductRepository:
             CatalogProductRepository by lazy {
@@ -138,12 +244,69 @@ class DefaultAppContainer(
     }
 
     // =========================================
+    // HU04 - BASE DE DATOS DEL CARRITO
+    // =========================================
+
+    /**
+     * Nueva base de datos Room exclusiva
+     * para el carrito de compras.
+     *
+     * Archivo:
+     * farmapp_cart.db
+     *
+     * Mantiene separados los datos de HU03.
+     * Cada producto del carrito se identifica
+     * mediante userId y SKU.
+     */
+    private val cartDatabase: CartDatabase by lazy {
+
+        Room.databaseBuilder(
+            appContext.applicationContext,
+            CartDatabase::class.java,
+            "farmapp_cart.db"
+        ).build()
+    }
+
+    /**
+     * Repositorio del carrito HU04.
+     *
+     * Recibe:
+     *
+     * 1. CartItemDao:
+     *    Para guardar y consultar el carrito.
+     *
+     * 2. CatalogProductRepository:
+     *    Para consultar precios y stock.
+     *
+     * 3. FirebaseAuth:
+     *    Para identificar al usuario actual.
+     *
+     * Esto permite reutilizar los productos
+     * existentes sin duplicar el catalogo.
+     */
+    override val cartRepository: CartRepository by lazy {
+
+        OfflineCartRepository(
+            dao = cartDatabase.cartItemDao(),
+            catalogRepository = catalogProductRepository,
+            firebaseAuth = FirebaseAuth.getInstance()
+        )
+    }
+
+    // =========================================
     // RETROFIT - PRODUCTOS REMOTOS
     // =========================================
 
+    /**
+     * Servicio remoto educativo existente.
+     *
+     * Se conserva para no afectar los
+     * modulos desarrollados anteriormente.
+     */
     private val baseUrl = "https://dummyjson.com/"
 
     private val json by lazy {
+
         Json {
             ignoreUnknownKeys = true
         }
@@ -181,12 +344,14 @@ class DefaultAppContainer(
     }
 
     // =========================================
-    // CATÁLOGO EDUCATIVO EXISTENTE
+    // CATALOGO EDUCATIVO EXISTENTE
     // =========================================
 
     /**
-     * Este catálogo de demostración se conserva
-     * para no afectar las funcionalidades anteriores.
+     * Mantiene el catalogo educativo original.
+     *
+     * No se reemplaza por el catalogo comercial,
+     * ya que ambos tienen objetivos diferentes.
      */
     override val catalogRepository:
             CatalogRepository<DemoProduct> by lazy {
@@ -212,6 +377,14 @@ class DefaultAppContainer(
     // ROOM - LABORATORIO EDUCATIVO
     // =========================================
 
+    /**
+     * Base de datos utilizada en las
+     * demostraciones educativas de Room.
+     *
+     * Independiente de las bases:
+     * - farmapp_catalog.db
+     * - farmapp_cart.db
+     */
     private val roomDemoDatabase:
             RoomDemoDatabase by lazy {
 
@@ -258,6 +431,13 @@ class DefaultAppContainer(
     // HU01 - FIREBASE AUTHENTICATION
     // =========================================
 
+    /**
+     * Mantiene el inicio y cierre de sesion
+     * existente de HU01.
+     *
+     * El carrito utiliza el mismo FirebaseAuth
+     * para consultar el UID autenticado.
+     */
     override val authRepository:
             AuthRepository by lazy {
 

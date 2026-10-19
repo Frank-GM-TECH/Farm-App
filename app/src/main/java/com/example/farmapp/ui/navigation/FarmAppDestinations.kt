@@ -8,6 +8,12 @@ object FarmAppDestinations {
     const val CATEGORIES = "categories"
     const val ACCOUNT = "account"
     const val BARCODE_SCANNER = "barcode_scanner"
+    // HU04 - Carrito de compras.
+    const val CART = "cart"
+    // HU04 - Detalle de pedido.
+    const val ORDER_DETAIL = "order_detail"
+    // HU04 - Selección de botica.
+    const val PICKUP_STORE = "pickup_store"
     const val PROFILE = "profile"
     const val REMOTE_GALLERY = "remote_gallery"
     const val SQL_LAB = "sql_lab"

@@ -25,6 +25,8 @@ import com.example.farmapp.catalog.CatalogProductViewModel
 import com.example.farmapp.data.catalog.CatalogProductEntity
 import java.util.Locale
 import android.util.Log
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddShoppingCart
 
 /**
  * HU03 - Ruta del catálogo persistente.
@@ -207,7 +209,8 @@ fun CatalogProductScreen(
  */
 @Composable
 fun CatalogProductCard(
-    product: CatalogProductEntity
+    product: CatalogProductEntity,
+    onAddToCart: ((CatalogProductEntity) -> Unit)? = null
 ) {
     val context = LocalContext.current
 
@@ -297,6 +300,41 @@ fun CatalogProductCard(
                     MaterialTheme.colorScheme.error
                 }
             )
+
+            // HU04 - Botón compartido del carrito.
+            // Solo aparece cuando la pantalla
+            // proporciona la acción de agregar.
+
+            if (onAddToCart != null) {
+
+                Button(
+                    onClick = {
+                        onAddToCart(product)
+                    },
+                    enabled = product.stock > 0,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag("add_to_cart_${product.sku}")
+                ) {
+
+                    Icon(
+                        imageVector = Icons.Filled.AddShoppingCart,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+
+                    Spacer(Modifier.width(6.dp))
+
+                    Text(
+                        text = if (product.stock > 0) {
+                            "Agregar"
+                        } else {
+                            "Agotado"
+                        }
+                    )
+                }
+            }
+
         }
     }
 }

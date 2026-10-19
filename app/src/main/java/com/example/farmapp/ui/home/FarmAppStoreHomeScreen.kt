@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.example.farmapp.catalog.CatalogProductUiState
 import com.example.farmapp.ui.catalog.CatalogProductCard
+import com.example.farmapp.data.catalog.CatalogProductEntity
 
 /**
  * HU03 - Pantalla de inicio comercial de FarmApp.
@@ -35,6 +36,7 @@ import com.example.farmapp.ui.catalog.CatalogProductCard
  *
  * La navegación se conectará en el siguiente paso.
  */
+
 @Composable
 fun FarmAppStoreHomeScreen(
     uiState: CatalogProductUiState,
@@ -42,7 +44,9 @@ fun FarmAppStoreHomeScreen(
     onOpenAddress: () -> Unit,
     onOpenDelivery: () -> Unit,
     onOpenCart: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onAddToCart: ((CatalogProductEntity) -> Unit)? = null,
+    cartItemCount: Int = 0
 ) {
 
     val availableProducts = uiState.products.filter {
@@ -85,11 +89,25 @@ fun FarmAppStoreHomeScreen(
                     Text("Delivery")
                 }
 
-                IconButton(onClick = onOpenCart) {
-                    Icon(
-                        imageVector = Icons.Filled.ShoppingCart,
-                        contentDescription = "Mi carrito"
-                    )
+
+                IconButton(
+                    onClick = onOpenCart,
+                    modifier = Modifier.testTag("home_open_cart")
+                ) {
+                    BadgedBox(
+                        badge = {
+                            if (cartItemCount > 0) {
+                                Badge {
+                                    Text(cartItemCount.toString())
+                                }
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.ShoppingCart,
+                            contentDescription = "Mi carrito"
+                        )
+                    }
                 }
             }
         }
@@ -196,7 +214,8 @@ fun FarmAppStoreHomeScreen(
                     ) { product ->
 
                         CatalogProductCard(
-                            product = product
+                            product = product,
+                            onAddToCart = onAddToCart
                         )
                     }
                 }
