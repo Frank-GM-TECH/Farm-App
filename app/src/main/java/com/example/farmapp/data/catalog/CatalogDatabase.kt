@@ -2,22 +2,31 @@ package com.example.farmapp.data.catalog
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
-/**
- * HU03 - Base de datos local del catálogo.
- *
- * Almacena productos para consultas sin conexión.
- *
- * Es independiente de RoomDemoDatabase,
- * utilizada en los ejercicios anteriores.
- */
 @Database(
     entities = [CatalogProductEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class CatalogDatabase : RoomDatabase() {
 
     abstract fun catalogProductDao(): CatalogProductDao
 
+    companion object {
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(
+                db: SupportSQLiteDatabase
+            ) {
+                db.execSQL(
+                    """
+                    ALTER TABLE catalog_products
+                    ADD COLUMN active INTEGER
+                    NOT NULL DEFAULT 1
+                    """.trimIndent()
+                )
+            }
+        }
+    }
 }

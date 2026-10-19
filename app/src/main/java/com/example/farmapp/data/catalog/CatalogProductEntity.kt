@@ -39,6 +39,9 @@ data class CatalogProductEntity(
 
     val stock: Int,
 
-    val imageUrl: String? = null
+    val imageUrl: String? = null,
+
+// Estado de publicación en Firebase.
+    val active: Boolean = true
 
 )

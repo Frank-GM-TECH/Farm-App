@@ -239,7 +239,9 @@ class DefaultAppContainer(
             appContext.applicationContext,
             CatalogDatabase::class.java,
             "farmapp_catalog.db"
-        ).build()
+        )
+            .addMigrations(CatalogDatabase.MIGRATION_1_2)
+            .build()
     }
 
     /**
