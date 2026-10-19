@@ -37,6 +37,7 @@ import com.example.farmapp.ui.background.InventoryReportRoute
 import com.example.farmapp.ui.cart.FarmAppCartScreen
 import com.example.farmapp.ui.checkout.FarmAppOrderDetailScreen
 import com.example.farmapp.ui.checkout.FarmAppPickupStoreScreen
+import com.example.farmapp.ui.checkout.FarmAppPaymentMethodScreen
 import com.example.farmapp.ui.catalog.FarmAppCategoriesScreen
 import com.example.farmapp.ui.catalog.RemoteProductGalleryRoute
 import com.example.farmapp.ui.home.FarmAppStoreHomeScreen
@@ -364,11 +365,11 @@ fun FarmAppNavHost(
                         checkoutViewModel.setOtherRecipientName(name)
                     },
                     onOpenPaymentMethod = {
-                        Toast.makeText(
-                            context,
-                            "Métodos de pago: próximamente",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        navController.navigate(
+                            FarmAppDestinations.PAYMENT_METHOD
+                        ) {
+                            launchSingleTop = true
+                        }
                     },
                     onOpenReceipt = {
                         Toast.makeText(
@@ -391,6 +392,21 @@ fun FarmAppNavHost(
                             "La confirmación estará disponible al completar el checkout.",
                             Toast.LENGTH_LONG
                         ).show()
+                    }
+                )
+            }
+        }
+        // HU04 - Paso 10: Seleccion de metodo de pago.
+        composable(FarmAppDestinations.PAYMENT_METHOD) {
+            if (uiState.isAuthenticated) {
+                FarmAppPaymentMethodScreen(
+                    currentMethod = orderUiState.paymentMethod,
+                    onBack = {
+                        navController.popBackStack()
+                    },
+                    onSave = { method ->
+                        checkoutViewModel.setPaymentMethod(method)
+                        navController.popBackStack()
                     }
                 )
             }
