@@ -29,6 +29,8 @@ import com.example.farmapp.network.RemoteProduct
 import com.example.farmapp.network.RemoteProductsPhase
 import com.example.farmapp.network.RemoteProductsRepository
 import com.example.farmapp.network.RemoteProductsViewModel
+// HU04 - Paso 13A: repositorio de pedidos.
+import com.example.farmapp.data.orders.OrderRepository
 
 // HU02 - Repositorio de perfiles.
 import com.example.farmapp.profile.ProfileRepository
@@ -102,6 +104,14 @@ class ManualDiViewModelTest {
         override val cartRepository: CartRepository
             get() = error(
                 "El carrito HU04 no se utiliza en esta prueba"
+            )
+        // =========================================
+        // HU04 - PASO 13A: PEDIDOS EN FIRESTORE
+        // =========================================
+
+        override val orderRepository: OrderRepository
+            get() = error(
+                "Los pedidos Firestore no se utilizan en esta prueba"
             )
 
         // =========================================

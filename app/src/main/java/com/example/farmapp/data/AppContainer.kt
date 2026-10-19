@@ -97,6 +97,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
+import com.example.farmapp.data.orders.OrderRepository
+import com.example.farmapp.data.orders.FirestoreOrderRepository
+
 /**
  * Contenedor principal de dependencias de FarmApp.
  *
@@ -113,6 +116,9 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
  * las pruebas unitarias.
  */
 interface AppContainer {
+
+    // HU04 - Paso 13A: pedidos en Firestore.
+    val orderRepository: OrderRepository
 
     // =====================================
     // SERVICIOS REMOTOS
@@ -188,6 +194,14 @@ interface AppContainer {
 class DefaultAppContainer(
     private val appContext: Context
 ) : AppContainer {
+
+    // HU04 - Paso 13A: repositorio de pedidos.
+    override val orderRepository: OrderRepository by lazy {
+        FirestoreOrderRepository(
+            firestore = FirebaseFirestore.getInstance(),
+            auth = FirebaseAuth.getInstance()
+        )
+    }
 
     // =========================================
     // HU02 - PERFIL DE USUARIO CON FIRESTORE
