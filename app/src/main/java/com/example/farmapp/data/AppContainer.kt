@@ -243,6 +243,13 @@ class DefaultAppContainer(
             .addMigrations(CatalogDatabase.MIGRATION_1_2)
             .build()
     }
+    val catalogRealtimeSync: com.example.farmapp.data.catalog.CatalogRealtimeSync by lazy {
+        com.example.farmapp.data.catalog.CatalogRealtimeSync(
+            firestore = FirebaseFirestore.getInstance(),
+            auth = FirebaseAuth.getInstance(),
+            dao = catalogDatabase.catalogProductDao()
+        )
+    }
 
     /**
      * Repositorio del catalogo HU03.

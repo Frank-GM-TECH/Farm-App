@@ -15,12 +15,8 @@ import kotlinx.coroutines.flow.Flow
 interface CatalogProductDao {
 
     // Observar todos los productos.
-    @Query(
-        "SELECT * FROM catalog_products " +
-                "ORDER BY name COLLATE NOCASE ASC"
-    )
+    @Query("SELECT * FROM catalog_products WHERE active = 1 ORDER BY name COLLATE NOCASE ASC")
     fun observeAll(): Flow<List<CatalogProductEntity>>
-
     // Buscar producto por SKU.
     @Query(
         "SELECT * FROM catalog_products " +
@@ -74,5 +70,13 @@ interface CatalogProductDao {
         if (countProducts() == 0) {
             insertIfMissing(products)
         }
+    }
+    @Query("UPDATE catalog_products SET active = 0")
+    suspend fun deactivateAllCachedProducts()
+
+    @Transaction
+    suspend fun replaceActiveSnapshot(products: List<CatalogProductEntity>) {
+        deactivateAllCachedProducts()
+        upsertAll(products)
     }
 }

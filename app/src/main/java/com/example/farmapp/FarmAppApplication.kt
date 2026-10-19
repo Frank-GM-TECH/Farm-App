@@ -12,5 +12,6 @@ class FarmAppApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         container = DefaultAppContainer(this)
+        (container as DefaultAppContainer).catalogRealtimeSync.start()
     }
 }
