@@ -1,32 +1,166 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+import {setGlobalOptions} from "firebase-functions/v2";
+import {onCall, HttpsError} from "firebase-functions/v2/https";
 
-import {setGlobalOptions} from "firebase-functions";
-// import {onRequest} from "firebase-functions/https";
-// import * as logger from "firebase-functions/logger";
+setGlobalOptions({
+  region: "us-central1",
+  maxInstances: 10,
+});
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
+interface OrderItemInput {
+  sku: string;
+  quantity: number;
+}
 
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
-setGlobalOptions({maxInstances: 10});
+interface CreateOrderInput {
+  requestId: string;
+  items: OrderItemInput[];
+  couponCode?: string | null;
+  deliveryMethod: "DELIVERY" | "PICKUP";
+  deliveryAddress?: string | null;
+  pickupStoreId?: string | null;
+  paymentMethod: string;
+  receiptType: string;
+  invoiceRuc?: string | null;
+  invoiceBusinessName?: string | null;
+}
 
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+export const createOrder = onCall(
+  {enforceAppCheck: false},
+  async (request) => {
+    const uid = request.auth?.uid;
+
+    if (!uid) {
+      throw new HttpsError(
+        "unauthenticated",
+        "Debes iniciar sesión para registrar un pedido."
+      );
+    }
+
+    const data = request.data as CreateOrderInput | null;
+
+    if (!data || typeof data !== "object" ||
+        Array.isArray(data)) {
+      throw new HttpsError(
+        "invalid-argument",
+        "La solicitud del pedido no es válida."
+      );
+    }
+
+    if (typeof data.requestId !== "string" ||
+        !/^[a-zA-Z0-9_-]{8,80}$/.test(data.requestId)) {
+      throw new HttpsError(
+        "invalid-argument",
+        "El identificador del pedido no es válido."
+      );
+    }
+
+    if (!Array.isArray(data.items) ||
+        data.items.length === 0 ||
+        data.items.length > 50) {
+      throw new HttpsError(
+        "invalid-argument",
+        "El pedido debe contener entre 1 y 50 productos."
+      );
+    }
+
+    const skus = new Set<string>();
+
+    for (const item of data.items) {
+      if (!item || typeof item.sku !== "string" ||
+          !/^FA-[0-9]{3,}$/.test(item.sku) ||
+          !Number.isSafeInteger(item.quantity) ||
+          item.quantity < 1 ||
+          item.quantity > 100) {
+        throw new HttpsError(
+          "invalid-argument",
+          "Hay productos o cantidades inválidas."
+        );
+      }
+
+      if (skus.has(item.sku)) {
+        throw new HttpsError(
+          "invalid-argument",
+          "El pedido contiene productos duplicados."
+        );
+      }
+
+      skus.add(item.sku);
+    }
+
+    if (data.deliveryMethod === "DELIVERY") {
+      if (typeof data.deliveryAddress !== "string" ||
+          data.deliveryAddress.trim().length < 5 ||
+          data.deliveryAddress.length > 500) {
+        throw new HttpsError(
+          "invalid-argument",
+          "La dirección de entrega no es válida."
+        );
+      }
+    } else if (data.deliveryMethod === "PICKUP") {
+      if (typeof data.pickupStoreId !== "string" ||
+          !/^[a-zA-Z0-9_-]{1,80}$/.test(data.pickupStoreId)) {
+        throw new HttpsError(
+          "invalid-argument",
+          "Selecciona una botica válida."
+        );
+      }
+    } else {
+      throw new HttpsError(
+        "invalid-argument",
+        "Selecciona un método de entrega válido."
+      );
+    }
+
+    if (typeof data.paymentMethod !== "string" ||
+        !["EFECTIVO", "YAPE", "PLIN", "TARJETA_DEMO"]
+          .includes(data.paymentMethod)) {
+      throw new HttpsError(
+        "invalid-argument",
+        "Método de pago no reconocido."
+      );
+    }
+
+    if (typeof data.receiptType !== "string" ||
+        !["Boleta simple", "Factura"]
+          .includes(data.receiptType)) {
+      throw new HttpsError(
+        "invalid-argument",
+        "Comprobante no reconocido."
+      );
+    }
+
+    if (data.receiptType === "Factura") {
+      if (typeof data.invoiceRuc !== "string" ||
+          !/^\d{11}$/.test(data.invoiceRuc) ||
+          typeof data.invoiceBusinessName !== "string" ||
+          data.invoiceBusinessName.trim().length < 3 ||
+          data.invoiceBusinessName.length > 200) {
+        throw new HttpsError(
+          "invalid-argument",
+          "Los datos de facturación no son válidos."
+        );
+      }
+    }
+
+    const couponCode =
+      typeof data.couponCode === "string" ?
+        data.couponCode.trim().toUpperCase() : null;
+
+    if (couponCode && couponCode !== "FARMAPP10") {
+      throw new HttpsError(
+        "invalid-argument",
+        "Cupón no válido."
+      );
+    }
+
+    // Etapa de validación: sin escrituras en Firestore.
+    return {
+      validated: true,
+      persisted: false,
+      userId: uid,
+      requestId: data.requestId,
+      itemCount: data.items.length,
+      message: "Solicitud validada. Registro pendiente.",
+    };
+  }
+);
