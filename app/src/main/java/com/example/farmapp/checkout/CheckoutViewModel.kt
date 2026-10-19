@@ -133,6 +133,8 @@ class CheckoutViewModel : ViewModel() {
         _uiState.update {
             it.copy(
                 receiptType = "Boleta simple",
+                invoiceRuc = "",
+                invoiceBusinessName = "",
                 invoiceValid = false
             )
         }
@@ -150,6 +152,28 @@ class CheckoutViewModel : ViewModel() {
     fun setInvoiceValid(valid: Boolean) {
         _uiState.update {
             it.copy(invoiceValid = valid)
+        }
+    }
+
+    fun setInvoiceDetails(
+        ruc: String,
+        businessName: String
+    ) {
+        val cleanRuc = ruc.trim()
+        val cleanName = businessName.trim()
+
+        val valid =
+            cleanRuc.length == 11 &&
+                    cleanRuc.all { it.isDigit() } &&
+                    cleanName.length >= 3
+
+        _uiState.update {
+            it.copy(
+                receiptType = "Factura",
+                invoiceRuc = cleanRuc,
+                invoiceBusinessName = cleanName,
+                invoiceValid = valid
+            )
         }
     }
 

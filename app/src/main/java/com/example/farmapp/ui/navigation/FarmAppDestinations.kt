@@ -17,6 +17,8 @@ object FarmAppDestinations {
     const val DELIVERY_ADDRESS = "delivery_address"
     // HU04 - Paso 10: Seleccion del metodo de pago.
     const val PAYMENT_METHOD = "payment_method"
+    // HU04 - Paso 11: Comprobante.
+    const val RECEIPT = "receipt"
     const val PROFILE = "profile"
     const val REMOTE_GALLERY = "remote_gallery"
     const val SQL_LAB = "sql_lab"

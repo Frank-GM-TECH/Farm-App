@@ -64,6 +64,8 @@ data class OrderDetailUiState(
     val otherRecipientName: String = "",
     val paymentMethod: String? = null,
     val receiptType: String? = null,
+    val invoiceRuc: String = "",
+    val invoiceBusinessName: String = "",
     val invoiceValid: Boolean = false,
     val couponCode: String? = null,
     val discountCents: Long = 0L,

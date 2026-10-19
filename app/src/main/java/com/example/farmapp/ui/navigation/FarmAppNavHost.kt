@@ -48,6 +48,7 @@ import com.example.farmapp.ui.room.RoomDemoRoute
 import com.example.farmapp.ui.scanner.FarmAppBarcodeScannerScreen
 import com.example.farmapp.ui.sql.SqlLabRoute
 import com.example.farmapp.ui.checkout.FarmAppDeliveryAddressScreen
+import com.example.farmapp.ui.checkout.FarmAppReceiptScreen
 
 /**
  * HU04 - Paso 8: carrito, detalle de pedido y seleccion de botica.
@@ -372,11 +373,9 @@ fun FarmAppNavHost(
                         }
                     },
                     onOpenReceipt = {
-                        Toast.makeText(
-                            context,
-                            "Comprobantes de pago: próximamente",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        navController.navigate(FarmAppDestinations.RECEIPT) {
+                            launchSingleTop = true
+                        }
                     },
                     onOpenCoupon = {
                         Toast.makeText(
@@ -396,6 +395,32 @@ fun FarmAppNavHost(
                 )
             }
         }
+
+        // HU04 - Paso 11: Seleccion de comprobante.
+        composable(FarmAppDestinations.RECEIPT) {
+            if (uiState.isAuthenticated) {
+                FarmAppReceiptScreen(
+                    currentType = orderUiState.receiptType,
+                    currentRuc = orderUiState.invoiceRuc,
+                    currentBusinessName = orderUiState.invoiceBusinessName,
+                    onBack = {
+                        navController.popBackStack()
+                    },
+                    onSave = { type, ruc, businessName ->
+                        if (type == "Factura") {
+                            checkoutViewModel.setInvoiceDetails(
+                                ruc = ruc,
+                                businessName = businessName
+                            )
+                        } else {
+                            checkoutViewModel.selectBoleta()
+                        }
+                        navController.popBackStack()
+                    }
+                )
+            }
+        }
+
         // HU04 - Paso 10: Seleccion de metodo de pago.
         composable(FarmAppDestinations.PAYMENT_METHOD) {
             if (uiState.isAuthenticated) {
