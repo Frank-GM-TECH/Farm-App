@@ -34,6 +34,25 @@ android {
         }
         debug { isDebuggable = true }
     }
+    // =============================================
+// FARMAPP - ENTORNOS DE EJECUCIÓN
+// =============================================
+
+    flavorDimensions += "environment"
+
+    productFlavors {
+
+        create("normal") {
+            dimension = "environment"
+        }
+
+        create("hu04Test") {
+            dimension = "environment"
+
+            applicationIdSuffix = ".hu04test"
+            versionNameSuffix = "-HU04-TEST"
+        }
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -44,6 +63,7 @@ android {
     buildFeatures {
         compose = true
         viewBinding = true
+        buildConfig = true
     }
     testOptions { unitTests.isIncludeAndroidResources = true }
     packaging { resources.excludes += "/META-INF/{AL2.0,LGPL2.1}" }
@@ -106,6 +126,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-storage")
+    implementation("com.google.firebase:firebase-functions")
     // HU01: Credential Manager + Google Identity Services; mantiene correo/contraseña.
     implementation("androidx.credentials:credentials:1.3.0")
     implementation("androidx.credentials:credentials-play-services-auth:1.3.0")

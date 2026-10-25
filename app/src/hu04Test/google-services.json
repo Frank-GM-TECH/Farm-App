@@ -1,0 +1,76 @@
+{
+  "project_info": {
+    "project_number": "343482712261",
+    "project_id": "farm-app-c5291",
+    "storage_bucket": "farm-app-c5291.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:343482712261:android:ec45e0c41e3ab48324b0ac",
+        "android_client_info": {
+          "package_name": "com.example.farmapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "343482712261-he490cnrq56n35i965n2tg9s903939t1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.farmapp",
+            "certificate_hash": "daa8171fa2235dc42bbb6ed68840eb1ee2cbb915"
+          }
+        },
+        {
+          "client_id": "343482712261-g9j9m3sv0t6a28ncquqau50897brphp2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPn8N4uI7Jg2X2UY2eAc76rWyC99jeU0Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "343482712261-g9j9m3sv0t6a28ncquqau50897brphp2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:343482712261:android:706a848c5d8510fd24b0ac",
+        "android_client_info": {
+          "package_name": "com.example.farmapp.hu04test"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "343482712261-g9j9m3sv0t6a28ncquqau50897brphp2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPn8N4uI7Jg2X2UY2eAc76rWyC99jeU0Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "343482712261-g9j9m3sv0t6a28ncquqau50897brphp2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

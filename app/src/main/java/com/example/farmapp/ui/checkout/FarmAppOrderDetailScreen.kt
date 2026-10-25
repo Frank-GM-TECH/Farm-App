@@ -69,7 +69,10 @@ data class OrderDetailUiState(
     val invoiceValid: Boolean = false,
     val couponCode: String? = null,
     val discountCents: Long = 0L,
-    val isProcessing: Boolean = false
+    val isProcessing: Boolean = false,
+    val confirmedOrderId: String? = null,
+    val confirmedTotalCents: Long? = null,
+    val submissionError: String? = null
 )
 
 /**
@@ -155,11 +158,13 @@ fun FarmAppOrderDetailScreen(
                 !cartUiState.isLoading &&
                 !cartUiState.isWorking &&
                 !orderUiState.isProcessing &&
+                orderUiState.confirmedOrderId == null &&
                 !hasUnavailableItems &&
                 hasDeliverySelection &&
                 !orderUiState.paymentMethod.isNullOrBlank() &&
                 hasReceipt &&
                 validDiscount
+
 
 
     Scaffold(
@@ -227,6 +232,37 @@ fun FarmAppOrderDetailScreen(
                             modifier = Modifier.testTag(
                                 "order_unavailable_products_warning"
                             )
+                        )
+                    }
+
+                    if (orderUiState.isProcessing) {
+                        LinearProgressIndicator(
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Text("Registrando pedido de demostración...")
+                    }
+
+                    orderUiState.submissionError?.let { message ->
+                        Text(
+                            text = message,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+
+                    orderUiState.confirmedOrderId?.let { orderId ->
+                        Text(
+                            text = "Pedido registrado: $orderId",
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.titleMedium
+                        )
+
+                        orderUiState.confirmedTotalCents?.let { amount ->
+                            Text("Total confirmado: ${formatSoles(amount)}")
+                        }
+
+                        Text(
+                            "Pedido de demostración. No se realizó ningún cobro."
                         )
                     }
 

@@ -394,12 +394,7 @@ fun FarmAppNavHost(
                         }
                     },
                     onConfirmOrder = {
-                        // En el paso 7 no se generan pedidos ni se cobran tarjetas.
-                        Toast.makeText(
-                            context,
-                            "La confirmación estará disponible al completar el checkout.",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        checkoutViewModel.confirmOrder(cartUiState)
                     }
                 )
             }
