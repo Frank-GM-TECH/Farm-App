@@ -32,6 +32,11 @@ import com.example.farmapp.ui.theme.FarmAppTheme
 import com.example.farmapp.ui.theme.FarmThemeMode
 import com.example.farmapp.data.preferences.AppThemePreference
 import com.example.farmapp.data.preferences.UserPreferencesViewModel
+import androidx.compose.foundation.layout.statusBarsPadding
+import android.app.Activity
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.SideEffect
+import androidx.core.view.WindowCompat
 
 /** Cotejo 16: tema + navegación separados de los destinos visuales. */
 @Composable
@@ -85,9 +90,35 @@ fun FarmAppRoot(
         it.name == preferenceState.preferences.theme.name
     } ?: FarmThemeMode.SYSTEM
 
+    val systemDarkTheme = isSystemInDarkTheme()
+
+    val darkThemeEnabled = when (selectedTheme) {
+        FarmThemeMode.SYSTEM -> systemDarkTheme
+        FarmThemeMode.LIGHT -> false
+        FarmThemeMode.DARK -> true
+    }
+
+    val activity = context as? Activity
+
+    SideEffect {
+        activity?.window?.let { window ->
+            WindowCompat.getInsetsController(
+                window,
+                window.decorView
+            ).apply {
+                isAppearanceLightStatusBars = !darkThemeEnabled
+                isAppearanceLightNavigationBars = !darkThemeEnabled
+            }
+        }
+    }
+
     FarmAppTheme(mode = selectedTheme) {
         Surface(modifier = Modifier.fillMaxSize()) {
-            Column(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding()
+            ) {
                 ThemeModeSelector(
                     selectedMode = selectedTheme,
                     onModeSelected = { preferencesViewModel.setTheme(AppThemePreference.valueOf(it.name)) },

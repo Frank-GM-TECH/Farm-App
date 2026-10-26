@@ -507,6 +507,7 @@ private fun CartSummaryPanel(
             modifier = Modifier
                 .fillMaxWidth()
                 .animateContentSize()
+                .navigationBarsPadding()
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
