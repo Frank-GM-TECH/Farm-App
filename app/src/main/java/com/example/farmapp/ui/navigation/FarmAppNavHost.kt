@@ -212,7 +212,10 @@ fun FarmAppNavHost(
                         onAddToCart = { product ->
                             cartViewModel.addProduct(sku = product.sku, quantity = 1)
                         },
-                        cartItemCount = cartUiState.totalUnits
+                        cartItemCount = cartUiState.totalUnits,
+                        onOpenCatalog = {
+                            navigateTopLevel(FarmAppDestinations.CATEGORIES)
+                        },
                     )
                 }
             }

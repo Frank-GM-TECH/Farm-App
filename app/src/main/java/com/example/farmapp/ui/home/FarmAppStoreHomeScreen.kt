@@ -22,6 +22,12 @@ import androidx.compose.ui.unit.dp
 import com.example.farmapp.catalog.CatalogProductUiState
 import com.example.farmapp.ui.catalog.CatalogProductCard
 import com.example.farmapp.data.catalog.CatalogProductEntity
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import com.example.farmapp.R
 
 /**
  * HU03 - Pantalla de inicio comercial de FarmApp.
@@ -46,7 +52,8 @@ fun FarmAppStoreHomeScreen(
     onOpenCart: () -> Unit,
     modifier: Modifier = Modifier,
     onAddToCart: ((CatalogProductEntity) -> Unit)? = null,
-    cartItemCount: Int = 0
+    cartItemCount: Int = 0,
+            onOpenCatalog: () -> Unit = {}
 ) {
 
     val availableProducts = uiState.products.filter {
@@ -146,7 +153,9 @@ fun FarmAppStoreHomeScreen(
 
             // Banner promocional de muestra.
             item(span = { GridItemSpan(maxLineSpan) }) {
-                FarmAppPromotionBanner()
+                FarmAppPromotionBanner(
+                    onClick = onOpenCatalog
+                )
             }
 
             // Encabezado de productos.
@@ -231,62 +240,24 @@ fun FarmAppStoreHomeScreen(
  * Más adelante se podrá reemplazar por
  * una imagen drawable propia de FarmApp.
  */
+
 @Composable
-private fun FarmAppPromotionBanner() {
-
-    val gradient = Brush.horizontalGradient(
-        colors = listOf(
-            Color(0xFF087B4A),
-            Color(0xFF1BB778)
-        )
-    )
-
-    Column(
+private fun FarmAppPromotionBanner(
+    onClick: () -> Unit
+) {
+    Image(
+        painter = painterResource(
+            id = R.drawable.farmapp_banner_home
+        ),
+        contentDescription =
+            "FarmApp. Tu bienestar, nuestra prioridad. " +
+                    "Explorar productos del catálogo.",
+        contentScale = ContentScale.FillBounds,
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                brush = gradient,
-                shape = RoundedCornerShape(20.dp)
-            )
-            .padding(20.dp)
-            .testTag("home_promotion_banner"),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Filled.LocalOffer,
-                contentDescription = null,
-                tint = Color.White
-            )
-
-            Spacer(Modifier.width(8.dp))
-
-            Text(
-                text = "PROMOCIÓN DE DEMOSTRACIÓN",
-                color = Color.White,
-                style = MaterialTheme.typography.labelMedium
-            )
-        }
-
-        Text(
-            text = "¡Ofertas por tiempo limitado!",
-            color = Color.White,
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Text(
-            text = "Descubre productos para tu salud y bienestar.",
-            color = Color.White,
-            style = MaterialTheme.typography.bodyLarge
-        )
-
-        Text(
-            text = "Imagen promocional ilustrativa",
-            color = Color.White,
-            style = MaterialTheme.typography.labelSmall
-        )
-    }
+            .aspectRatio(1881f / 836f)
+            .clip(RoundedCornerShape(20.dp))
+            .clickable(onClick = onClick)
+            .testTag("home_promotion_banner")
+    )
 }
