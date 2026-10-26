@@ -31,6 +31,7 @@ import com.example.farmapp.cart.CartUiState
 import com.example.farmapp.data.cart.CartItem
 import java.text.NumberFormat
 import java.util.Locale
+import com.example.farmapp.ui.catalog.farmAppProductImage
 
 /**
  * HU04 - Pantalla principal del carrito de FarmApp.
@@ -336,11 +337,17 @@ private fun CartProductCard(
 
                 // Foto del producto con el User-Agent
                 // que solucionó el error 403 en HU03.
-                if (!item.imageUrl.isNullOrBlank()) {
+                if (
+                    farmAppProductImage(item.sku) != null ||
+                    !item.imageUrl.isNullOrBlank()
+                ) {
 
                     AsyncImage(
                         model = ImageRequest.Builder(context)
-                            .data(item.imageUrl)
+                            .data(
+                                farmAppProductImage(item.sku)
+                                    ?: item.imageUrl
+                            )
                             .setHeader(
                                 "User-Agent",
                                 "FarmApp/1.0 " +

@@ -230,7 +230,10 @@ fun CatalogProductCard(
             AsyncImage(
 
                 model = ImageRequest.Builder(context)
-                    .data(product.imageUrl)
+                    .data(
+                        farmAppProductImage(product.sku)
+                            ?: product.imageUrl
+                    )
                     .setHeader(
                         "User-Agent",
                         "FarmApp/1.0 (https://github.com/Frank-GM-TECH/Farm-App)"
