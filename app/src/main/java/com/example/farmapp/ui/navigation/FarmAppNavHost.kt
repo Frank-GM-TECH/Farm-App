@@ -50,6 +50,8 @@ import com.example.farmapp.ui.sql.SqlLabRoute
 import com.example.farmapp.ui.checkout.FarmAppDeliveryAddressScreen
 import com.example.farmapp.ui.checkout.FarmAppReceiptScreen
 import com.example.farmapp.ui.checkout.FarmAppCouponScreen
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * HU04 - Paso 8: carrito, detalle de pedido y seleccion de botica.
@@ -74,6 +76,11 @@ fun FarmAppNavHost(
     onGalleryLayoutSelected: (GalleryLayoutPreference) -> Unit = {}
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    var preparingNextOrder by remember {
+        mutableStateOf(false)
+    }
     val chooserTitle = stringResource(R.string.nav_share_chooser_title)
     val shareLabel = stringResource(R.string.nav_share_message)
 
@@ -393,8 +400,40 @@ fun FarmAppNavHost(
                             launchSingleTop = true
                         }
                     },
+
                     onConfirmOrder = {
                         checkoutViewModel.confirmOrder(cartUiState)
+                    },
+                    onStartNewOrder = {
+                        if (
+                            orderUiState.confirmedOrderId != null &&
+                            !preparingNextOrder
+                        ) {
+                            preparingNextOrder = true
+
+                            scope.launch {
+                                try {
+                                    val cleared =
+                                        cartViewModel.clearCartAfterConfirmedOrder()
+
+                                    if (cleared) {
+                                        checkoutViewModel.resetCheckout()
+
+                                        navigateTopLevel(
+                                            FarmAppDestinations.HOME
+                                        )
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            "No se pudo preparar la nueva compra. Intenta otra vez.",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
+                                } finally {
+                                    preparingNextOrder = false
+                                }
+                            }
+                        }
                     }
                 )
             }

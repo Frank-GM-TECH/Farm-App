@@ -97,6 +97,7 @@ fun FarmAppOrderDetailScreen(
     onOpenReceipt: () -> Unit,
     onOpenCoupon: () -> Unit,
     onConfirmOrder: () -> Unit,
+    onStartNewOrder: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showProducts by rememberSaveable {
@@ -264,17 +265,38 @@ fun FarmAppOrderDetailScreen(
                         Text(
                             "Pedido de demostración. No se realizó ningún cobro."
                         )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Button(
+                            onClick = onStartNewOrder,
+                            enabled = !cartUiState.isWorking,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(54.dp)
+                                .testTag("order_new_order_button")
+                        ) {
+                            Text(
+                                if (cartUiState.isWorking) {
+                                    "Preparando nueva compra..."
+                                } else {
+                                    "Realizar otro pedido"
+                                }
+                            )
+                        }
                     }
 
-                    Button(
-                        onClick = onConfirmOrder,
-                        enabled = canConfirm,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(54.dp)
-                            .testTag("order_confirm_button")
-                    ) {
-                        Text("Confirmar pedido")
+                    if (orderUiState.confirmedOrderId == null) {
+                        Button(
+                            onClick = onConfirmOrder,
+                            enabled = canConfirm,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(54.dp)
+                                .testTag("order_confirm_button")
+                        ) {
+                            Text("Confirmar pedido")
+                        }
                     }
                 }
             }

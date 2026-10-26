@@ -241,6 +241,69 @@ class CartViewModel(
         }
     }
 
+    /**
+     * Limpia el carrito después de confirmar
+     * correctamente un pedido.
+     *
+     * Devuelve true únicamente si la limpieza
+     * se completó satisfactoriamente.
+     */
+    suspend fun clearCartAfterConfirmedOrder(): Boolean {
+        val userId = activeUserId.value ?: return false
+
+        if (_uiState.value.isWorking) {
+            return false
+        }
+
+        _uiState.update {
+            it.copy(
+                isWorking = true,
+                message = null
+            )
+        }
+
+        return try {
+            repository.clearCart(userId)
+
+            if (activeUserId.value != userId) {
+                false
+            } else {
+                _uiState.update {
+                    it.copy(
+                        items = emptyList(),
+                        totalUnits = 0,
+                        subtotalCents = 0L,
+                        message = null
+                    )
+                }
+                true
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.e(
+                "FarmAppCart",
+                "Error al limpiar carrito después del pedido",
+                e
+            )
+
+            if (activeUserId.value == userId) {
+                _uiState.update {
+                    it.copy(
+                        message = "No se pudo preparar una nueva compra."
+                    )
+                }
+            }
+            false
+        } finally {
+            if (activeUserId.value == userId) {
+                _uiState.update {
+                    it.copy(isWorking = false)
+                }
+            }
+        }
+    }
+
     // =========================================
     // EJECUTAR OPERACIONES SEGURAS
     // =========================================
