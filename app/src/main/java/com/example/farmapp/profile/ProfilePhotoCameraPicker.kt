@@ -1,6 +1,9 @@
 package com.example.farmapp.profile
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import java.io.File
 
@@ -29,9 +33,8 @@ fun ProfilePhotoCameraPicker(
     }
 
     val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
+        ActivityResultContracts.TakePicture()
     ) { success ->
-
         val capturedUri = pendingUri?.let(Uri::parse)
         pendingUri = null
 
@@ -40,45 +43,74 @@ fun ProfilePhotoCameraPicker(
         }
     }
 
+    val launchCamera: () -> Unit = {
+        try {
+            val directory = File(
+                context.cacheDir,
+                "profile_photos"
+            )
+
+            check(directory.exists() || directory.mkdirs())
+
+            val photoFile = File.createTempFile(
+                "farmapp_camera_",
+                ".jpg",
+                directory
+            )
+
+            val photoUri = FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                photoFile
+            )
+
+            pendingUri = photoUri.toString()
+            cameraLauncher.launch(photoUri)
+
+        } catch (e: Exception) {
+            pendingUri = null
+
+            Log.e(
+                "FarmAppCamera",
+                "No se pudo abrir la cámara",
+                e
+            )
+
+            Toast.makeText(
+                context,
+                "No se pudo abrir la cámara.",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            launchCamera()
+        } else {
+            Toast.makeText(
+                context,
+                "Se necesita permiso para usar la cámara.",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
     OutlinedButton(
         onClick = {
-            try {
-                val photoDirectory = File(
-                    context.cacheDir,
-                    "profile_photos"
+            val granted = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED
+
+            if (granted) {
+                launchCamera()
+            } else {
+                permissionLauncher.launch(
+                    Manifest.permission.CAMERA
                 )
-
-                check(
-                    photoDirectory.exists() ||
-                            photoDirectory.mkdirs()
-                ) {
-                    "No se pudo crear la carpeta temporal."
-                }
-
-                val photoFile = File.createTempFile(
-                    "farmapp_camera_",
-                    ".jpg",
-                    photoDirectory
-                )
-
-                val photoUri = FileProvider.getUriForFile(
-                    context,
-                    "${context.packageName}.fileprovider",
-                    photoFile
-                )
-
-                pendingUri = photoUri.toString()
-
-                cameraLauncher.launch(photoUri)
-
-            } catch (e: Exception) {
-                pendingUri = null
-
-                Toast.makeText(
-                    context,
-                    "No se pudo abrir la cámara.",
-                    Toast.LENGTH_LONG
-                ).show()
             }
         },
         enabled = enabled,

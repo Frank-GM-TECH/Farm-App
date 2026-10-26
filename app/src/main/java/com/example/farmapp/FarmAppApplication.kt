@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.example.farmapp.BuildConfig
+import com.google.firebase.storage.FirebaseStorage
 class FarmAppApplication : Application() {
 
     lateinit var container: AppContainer
@@ -42,6 +43,7 @@ class FarmAppApplication : Application() {
             "127.0.0.1"
         }
 
+
         FirebaseAuth.getInstance()
             .useEmulator(host, 9099)
 
@@ -50,6 +52,12 @@ class FarmAppApplication : Application() {
 
         FirebaseFunctions.getInstance("us-central1")
             .useEmulator(host, 5001)
+
+// HU02: Fotografías de perfil en Storage Emulator
+        FirebaseStorage.getInstance(
+            "gs://farm-app-c5291.firebasestorage.app"
+        ).useEmulator(host, 9199)
+
 
         Log.i(
             "FarmAppEmulator",
