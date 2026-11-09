@@ -1,0 +1,18 @@
+ROOM
+
+
+4. ¿Entonces qué diferencia hay entre ROOM y Firebase Emulator?
+Esta es otra pregunta probable de tu profesora.
+Room (SQLite)	                                              Firebase Emulator
+Guarda información local dentro de la aplicación Android.	Simula servicios Firebase en la computadora.
+Guarda el carrito del usuario.                           	Guarda usuarios, productos, perfiles y pedidos de prueba.
+Funciona sin un servidor Firebase.	                         Necesita ejecutar los emuladores correspondientes.
+Utiliza DAO y consultas SQL.	                          	  Utiliza los SDK de Firebase y Cloud Functions.
+
+Por ejemplo, en HU04:
+1. Presionas Agregar al carrito → Room almacena el artículo en el dispositivo.
+2. Cambias la cantidad → Room actualiza el carrito local.
+3. Presionas Confirmar pedido → la aplicación llama a Cloud Functions Emulator.
+4. La función comprueba el stock en Firestore Emulator.
+5. Si todo es válido, Firestore guarda el pedido y descuenta las unidades disponibles.
+Por eso utilizamos Room y Firebase Emulator en la misma aplicación: cada uno cumple una responsabilidad diferente.
