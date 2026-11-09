@@ -1,0 +1,12 @@
+IA
+
+
+¿Qué debes responder a tu profesora?
+«Profesora, sí hemos integrado una tecnología de inteligencia artificial mediante Google ML Kit, específicamente su API 
+de reconocimiento de códigos de barras.
+
+En FarmApp utilizamos CameraX para capturar imágenes y ML Kit para reconocer y decodificar automáticamente los códigos 
+de los productos.
+
+No entrenamos un modelo propio, sino que integramos uno proporcionado por Google. Esta funcionalidad permite identificar
+ productos más rápidamente dentro de nuestro catálogo».
