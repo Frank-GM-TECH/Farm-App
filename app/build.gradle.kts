@@ -155,6 +155,11 @@
         // HU03 - Proporciona ListenableFuture para CameraX.
         implementation("com.google.guava:guava:33.4.8-android")
 
+        // HU03 - IA para interpretar búsquedas por voz
+        implementation("com.google.firebase:firebase-ai")
+
+        implementation("com.google.firebase:firebase-appcheck")
+        implementation("com.google.firebase:firebase-appcheck-debug")
 
 
         testImplementation("junit:junit:4.13.2")

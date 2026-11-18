@@ -1,67 +1,119 @@
 
-    package com.example.farmapp
+package com.example.farmapp
 
-    import android.app.Application
-    import android.os.Build
-    import android.util.Log
-    import com.example.farmapp.data.AppContainer
-    import com.example.farmapp.data.DefaultAppContainer
-    import com.google.firebase.auth.FirebaseAuth
-    import com.google.firebase.firestore.FirebaseFirestore
-    import com.google.firebase.functions.FirebaseFunctions
-    import com.example.farmapp.BuildConfig
-    import com.google.firebase.storage.FirebaseStorage
-    class FarmAppApplication : Application() {
+import android.app.Application
+import android.os.Build
+import android.util.Log
 
-        lateinit var container: AppContainer
-            private set
+import com.example.farmapp.data.AppContainer
+import com.example.farmapp.data.DefaultAppContainer
 
-        override fun onCreate() {
-            super.onCreate()
+import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.storage.FirebaseStorage
 
-            // Solo HU04 Test Debug utiliza Firebase Emulator.
-            if (BuildConfig.DEBUG && BuildConfig.FLAVOR == "hu04Test") {
-                configureFirebaseEmulators()
-            }
+import com.google.firebase.appcheck.appCheck
+import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
+import com.google.firebase.initialize
 
-            container = DefaultAppContainer(this)
+class FarmAppApplication : Application() {
 
-            (container as DefaultAppContainer)
-                .catalogRealtimeSync.start()
-        }
+    lateinit var container: AppContainer
+        private set
 
-        private fun configureFirebaseEmulators() {
+    override fun onCreate() {
+        super.onCreate()
 
-            val isAndroidEmulator =
-                Build.FINGERPRINT.startsWith("generic") ||
-                        Build.FINGERPRINT.contains("emulator") ||
-                        Build.MODEL.contains("sdk_gphone")
+        // 1. Inicializar Firebase antes de utilizar sus servicios.
+        Firebase.initialize(context = this)
 
-            val host = if (isAndroidEmulator) {
-                "10.0.2.2"
-            } else {
-                "127.0.0.1"
-            }
+        Log.i("FirebaseConfig", "Firebase inicializado")
 
+        // 2. Mostrar en Logcat qué proyecto Firebase está utilizando la app.
+        logFirebaseConfiguration()
 
-            FirebaseAuth.getInstance()
-                .useEmulator(host, 9099)
-
-            FirebaseFirestore.getInstance()
-                .useEmulator(host, 8080)
-
-            FirebaseFunctions.getInstance("us-central1")
-                .useEmulator(host, 5001)
-
-    // HU02: Fotografías de perfil en Storage Emulator
-            FirebaseStorage.getInstance(
-                "gs://farm-app-c5291.firebasestorage.app"
-            ).useEmulator(host, 9199)
-
+        // 3. Instalar App Check Debug en las compilaciones de desarrollo.
+        if (BuildConfig.DEBUG) {
+            Firebase.appCheck.installAppCheckProviderFactory(
+                DebugAppCheckProviderFactory.getInstance()
+            )
 
             Log.i(
-                "FarmAppEmulator",
-                "Firebase Emulator configurado en $host"
+                "AppCheckTest",
+                "Proveedor Debug de App Check instalado"
             )
         }
+
+        // 4. Solo HU04 Test Debug utiliza Firebase Emulator.
+        if (BuildConfig.DEBUG && BuildConfig.FLAVOR == "hu04Test") {
+            configureFirebaseEmulators()
+        }
+
+        // 5. Crear el contenedor de dependencias después de configurar Firebase.
+        container = DefaultAppContainer(this)
+
+        // 6. Iniciar la sincronización del catálogo.
+        (container as DefaultAppContainer)
+            .catalogRealtimeSync.start()
+
+        Log.i("FarmAppApplication", "Aplicación inicializada correctamente")
     }
+
+    private fun logFirebaseConfiguration() {
+
+        val options = FirebaseApp.getInstance().options
+
+        Log.i(
+            "FirebaseConfig",
+            "Project ID: ${options.projectId}"
+        )
+
+        Log.i(
+            "FirebaseConfig",
+            "Project Number: ${options.gcmSenderId}"
+        )
+
+        Log.i(
+            "FirebaseConfig",
+            "Storage Bucket: ${options.storageBucket}"
+        )
+    }
+
+    private fun configureFirebaseEmulators() {
+
+        val isAndroidEmulator =
+            Build.FINGERPRINT.startsWith("generic") ||
+                    Build.FINGERPRINT.contains("emulator") ||
+                    Build.MODEL.contains("sdk_gphone")
+
+        val host = if (isAndroidEmulator) {
+            "10.0.2.2"
+        } else {
+            "127.0.0.1"
+        }
+
+        // Authentication Emulator
+        FirebaseAuth.getInstance()
+            .useEmulator(host, 9099)
+
+        // Firestore Emulator
+        FirebaseFirestore.getInstance()
+            .useEmulator(host, 8080)
+
+        // Cloud Functions Emulator
+        FirebaseFunctions.getInstance("us-central1")
+            .useEmulator(host, 5001)
+
+        // Storage Emulator: utiliza el bucket predeterminado del JSON.
+        FirebaseStorage.getInstance()
+            .useEmulator(host, 9199)
+
+        Log.i(
+            "FarmAppEmulator",
+            "Firebase Emulator configurado en $host"
+        )
+    }
+}

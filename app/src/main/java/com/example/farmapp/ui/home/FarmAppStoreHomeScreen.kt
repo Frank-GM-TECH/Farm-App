@@ -1,6 +1,7 @@
 package com.example.farmapp.ui.home
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -9,40 +10,34 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.LocalOffer
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.unit.dp
-import com.example.farmapp.catalog.CatalogProductUiState
-import com.example.farmapp.ui.catalog.CatalogProductCard
-import com.example.farmapp.data.catalog.CatalogProductEntity
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import com.example.farmapp.R
+import com.example.farmapp.catalog.CatalogProductUiState
+import com.example.farmapp.data.catalog.CatalogProductEntity
+import com.example.farmapp.ui.catalog.CatalogProductCard
+import com.example.farmapp.ui.catalog.FarmAppVoiceSearchField
 
 /**
  * HU03 - Pantalla de inicio comercial de FarmApp.
  *
  * Incluye:
- * - Dirección de entrega
- * - Acceso a Delivery
- * - Acceso al carrito
- * - Búsqueda de productos
- * - Banner promocional de demostración
- * - Productos disponibles desde Room
- *
- * La navegación se conectará en el siguiente paso.
+ * - Dirección de entrega.
+ * - Acceso a Delivery.
+ * - Acceso al carrito.
+ * - Búsqueda de productos escrita y por voz.
+ * - Banner promocional de demostración.
+ * - Productos disponibles desde Room.
  */
-
 @Composable
 fun FarmAppStoreHomeScreen(
     uiState: CatalogProductUiState,
@@ -53,7 +48,8 @@ fun FarmAppStoreHomeScreen(
     modifier: Modifier = Modifier,
     onAddToCart: ((CatalogProductEntity) -> Unit)? = null,
     cartItemCount: Int = 0,
-            onOpenCatalog: () -> Unit = {}
+    onOpenCatalog: () -> Unit = {},
+    onVoiceQueryReceived: (String) -> Unit = onQueryChanged
 ) {
 
     val availableProducts = uiState.products.filter {
@@ -79,12 +75,16 @@ fun FarmAppStoreHomeScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
 
-            TextButton(onClick = onOpenAddress) {
+            TextButton(
+                onClick = onOpenAddress
+            ) {
                 Icon(
                     imageVector = Icons.Filled.LocationOn,
                     contentDescription = null
                 )
+
                 Spacer(Modifier.width(4.dp))
+
                 Text("Elegir dirección")
             }
 
@@ -92,10 +92,11 @@ fun FarmAppStoreHomeScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
-                TextButton(onClick = onOpenDelivery) {
+                TextButton(
+                    onClick = onOpenDelivery
+                ) {
                     Text("Delivery")
                 }
-
 
                 IconButton(
                     onClick = onOpenCart,
@@ -120,19 +121,15 @@ fun FarmAppStoreHomeScreen(
         }
 
         // =====================================
-        // BUSCADOR
+        // BUSCADOR CON VOZ E IA
         // =====================================
 
-        OutlinedTextField(
+        FarmAppVoiceSearchField(
             value = uiState.query,
             onValueChange = onQueryChanged,
-            label = {
-                Text("¿Qué producto buscas?")
-            },
-            singleLine = true,
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag("home_product_search")
+            onVoiceResult = onVoiceQueryReceived,
+            placeholder = "¿Qué producto buscas?",
+            testTag = "home_product_search"
         )
 
         Spacer(Modifier.height(12.dp))
@@ -152,15 +149,22 @@ fun FarmAppStoreHomeScreen(
         ) {
 
             // Banner promocional de muestra.
-            item(span = { GridItemSpan(maxLineSpan) }) {
+            item(
+                span = {
+                    GridItemSpan(maxLineSpan)
+                }
+            ) {
                 FarmAppPromotionBanner(
                     onClick = onOpenCatalog
                 )
             }
 
             // Encabezado de productos.
-            item(span = { GridItemSpan(maxLineSpan) }) {
-
+            item(
+                span = {
+                    GridItemSpan(maxLineSpan)
+                }
+            ) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
@@ -181,7 +185,11 @@ fun FarmAppStoreHomeScreen(
             // Estado de carga.
             if (uiState.isLoading) {
 
-                item(span = { GridItemSpan(maxLineSpan) }) {
+                item(
+                    span = {
+                        GridItemSpan(maxLineSpan)
+                    }
+                ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -196,7 +204,12 @@ fun FarmAppStoreHomeScreen(
 
                 // Error al cargar el catálogo.
                 if (uiState.errorMessage != null) {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
+
+                    item(
+                        span = {
+                            GridItemSpan(maxLineSpan)
+                        }
+                    ) {
                         Text(
                             text = uiState.errorMessage,
                             color = MaterialTheme.colorScheme.error
@@ -207,7 +220,11 @@ fun FarmAppStoreHomeScreen(
                 // Catálogo vacío.
                 if (availableProducts.isEmpty()) {
 
-                    item(span = { GridItemSpan(maxLineSpan) }) {
+                    item(
+                        span = {
+                            GridItemSpan(maxLineSpan)
+                        }
+                    ) {
                         Text(
                             text = "No hay productos disponibles.",
                             modifier = Modifier.padding(16.dp)
@@ -216,10 +233,12 @@ fun FarmAppStoreHomeScreen(
 
                 } else {
 
-                    // Productos reales de Room.
+                    // Productos de Room.
                     items(
                         items = availableProducts,
-                        key = { it.sku }
+                        key = {
+                            it.sku
+                        }
                     ) { product ->
 
                         CatalogProductCard(
@@ -234,17 +253,15 @@ fun FarmAppStoreHomeScreen(
 }
 
 /**
- * Banner estático.
+ * Banner estático de demostración.
  *
- * No es clicable ni ejecuta promociones.
- * Más adelante se podrá reemplazar por
- * una imagen drawable propia de FarmApp.
+ * No ejecuta promociones reales.
  */
-
 @Composable
 private fun FarmAppPromotionBanner(
     onClick: () -> Unit
 ) {
+
     Image(
         painter = painterResource(
             id = R.drawable.farmapp_banner_home

@@ -15,12 +15,15 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.QrCodeScanner
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,26 +31,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.example.farmapp.catalog.CatalogProductUiState
-import androidx.compose.material.icons.filled.QrCodeScanner
-import androidx.compose.material3.IconButton
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import com.example.farmapp.data.catalog.CatalogProductEntity
 
 /**
  * HU03 - Pantalla comercial de Categorías.
  *
- * Esta pantalla es independiente del NavController.
- * Recibe el estado del catálogo Room a través del ViewModel.
- *
  * Incluye:
- * - Búsqueda por nombre o código
- * - Filtros por categoría
- * - Productos con imagen, precio y stock
- * - Estados de carga, error y lista vacía
+ * - Búsqueda escrita y por voz con interpretación IA.
+ * - Filtros por categoría.
+ * - Productos con imagen, precio y stock.
+ * - Escáner de código de barras.
+ * - Estados de carga, error y lista vacía.
  */
-
 @Composable
 fun FarmAppCategoriesScreen(
     uiState: CatalogProductUiState,
@@ -57,8 +52,10 @@ fun FarmAppCategoriesScreen(
     modifier: Modifier = Modifier,
     onAddToCart: ((CatalogProductEntity) -> Unit)? = null,
     onOpenCart: (() -> Unit)? = null,
-    cartItemCount: Int = 0
+    cartItemCount: Int = 0,
+    onVoiceQueryReceived: (String) -> Unit = onQueryChanged
 ) {
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -70,28 +67,31 @@ fun FarmAppCategoriesScreen(
         // TÍTULO
         // ====================================
 
-        Spacer(modifier = Modifier.height(16.dp))
-
+        Spacer(
+            modifier = Modifier.height(16.dp)
+        )
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+
             Text(
                 text = "Categorías",
                 style = MaterialTheme.typography.headlineMedium
             )
 
-
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
-                // Escáner HU03: se conserva.
+                // Escáner HU03.
                 IconButton(
                     onClick = onOpenScanner,
-                    modifier = Modifier.testTag("categories_open_scanner")
+                    modifier = Modifier.testTag(
+                        "categories_open_scanner"
+                    )
                 ) {
                     Icon(
                         imageVector = Icons.Filled.QrCodeScanner,
@@ -105,7 +105,9 @@ fun FarmAppCategoriesScreen(
 
                     IconButton(
                         onClick = onOpenCart,
-                        modifier = Modifier.testTag("categories_open_cart")
+                        modifier = Modifier.testTag(
+                            "categories_open_cart"
+                        )
                     ) {
                         BadgedBox(
                             badge = {
@@ -124,10 +126,11 @@ fun FarmAppCategoriesScreen(
                     }
                 }
             }
-
         }
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(
+            modifier = Modifier.height(4.dp)
+        )
 
         Text(
             text = "Encuentra productos para tu salud y bienestar",
@@ -135,32 +138,26 @@ fun FarmAppCategoriesScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // ====================================
-        // BUSCADOR
-        // ====================================
-
-        OutlinedTextField(
-            value = uiState.query,
-            onValueChange = onQueryChanged,
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag("categories_product_search"),
-            placeholder = {
-                Text("Buscar productos...")
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Filled.Search,
-                    contentDescription = null
-                )
-            },
-            singleLine = true,
-            shape = MaterialTheme.shapes.medium
+        Spacer(
+            modifier = Modifier.height(16.dp)
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        // ====================================
+        // BUSCADOR CON VOZ E IA
+        // ====================================
+
+        FarmAppVoiceSearchField(
+            value = uiState.query,
+            onValueChange = onQueryChanged,
+            onVoiceResult = onVoiceQueryReceived,
+            placeholder = "Buscar productos...",
+            testTag = "categories_product_search",
+            showSearchIcon = true
+        )
+
+        Spacer(
+            modifier = Modifier.height(20.dp)
+        )
 
         // ====================================
         // FILTROS
@@ -171,7 +168,9 @@ fun FarmAppCategoriesScreen(
             style = MaterialTheme.typography.titleMedium
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(
+            modifier = Modifier.height(8.dp)
+        )
 
         Row(
             modifier = Modifier
@@ -209,7 +208,9 @@ fun FarmAppCategoriesScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(
+            modifier = Modifier.height(16.dp)
+        )
 
         // ====================================
         // RESULTADOS
@@ -233,7 +234,9 @@ fun FarmAppCategoriesScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(
+            modifier = Modifier.height(12.dp)
+        )
 
         // ====================================
         // GRID DE PRODUCTOS ROOM
@@ -247,9 +250,10 @@ fun FarmAppCategoriesScreen(
                 .testTag("categories_products_grid"),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                bottom = 20.dp
-            )
+            contentPadding =
+                androidx.compose.foundation.layout.PaddingValues(
+                    bottom = 20.dp
+                )
         ) {
 
             if (uiState.isLoading) {
@@ -259,7 +263,6 @@ fun FarmAppCategoriesScreen(
                         GridItemSpan(maxLineSpan)
                     }
                 ) {
-
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -287,7 +290,6 @@ fun FarmAppCategoriesScreen(
                             GridItemSpan(maxLineSpan)
                         }
                     ) {
-
                         Text(
                             text = uiState.errorMessage,
                             color = MaterialTheme.colorScheme.error,
@@ -304,7 +306,6 @@ fun FarmAppCategoriesScreen(
                             GridItemSpan(maxLineSpan)
                         }
                     ) {
-
                         Text(
                             text = "No encontramos productos para esta búsqueda.",
                             style = MaterialTheme.typography.bodyMedium,
@@ -315,10 +316,12 @@ fun FarmAppCategoriesScreen(
 
                 } else {
 
-                    // Tarjetas reutilizadas de HU03.
+                    // Tarjetas de productos de Room.
                     items(
                         items = uiState.products,
-                        key = { product -> product.sku }
+                        key = { product ->
+                            product.sku
+                        }
                     ) { product ->
 
                         CatalogProductCard(

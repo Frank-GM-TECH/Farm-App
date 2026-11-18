@@ -5,7 +5,8 @@ import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.tasks.await
 
 /** Implementación real con Firebase Authentication. */
-class FirebaseAuthRepository(
+class
+FirebaseAuthRepository(
     private val auth: FirebaseAuth
 ) : AuthRepository {
     override fun currentUserEmail(): String? = auth.currentUser?.email
