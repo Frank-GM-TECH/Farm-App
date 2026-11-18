@@ -5,6 +5,23 @@ object FarmAppDestinations {
     const val AUTH = "auth"
     const val HOME = "home"
     const val CATALOG = "catalog"
+    const val CATEGORIES = "categories"
+    const val ACCOUNT = "account"
+    const val BARCODE_SCANNER = "barcode_scanner"
+    // HU04 - Carrito de compras.
+    const val CART = "cart"
+    // HU04 - Detalle de pedido.
+    const val ORDER_DETAIL = "order_detail"
+    // HU04 - Selección de botica.
+    const val PICKUP_STORE = "pickup_store"
+    const val DELIVERY_ADDRESS = "delivery_address"
+    // HU04 - Paso 10: Seleccion del metodo de pago.
+    const val PAYMENT_METHOD = "payment_method"
+    // HU04 - Paso 11: Comprobante.
+    const val RECEIPT = "receipt"
+    // HU04 - Paso 12: Cupon de descuento.
+    const val COUPON = "coupon"
+    const val PROFILE = "profile"
     const val REMOTE_GALLERY = "remote_gallery"
     const val SQL_LAB = "sql_lab"
     const val ROOM_DEMO = "room_demo"

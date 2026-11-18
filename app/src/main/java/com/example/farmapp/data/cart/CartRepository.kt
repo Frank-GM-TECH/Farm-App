@@ -1,0 +1,220 @@
+package com.example.farmapp.data.cart
+
+import com.example.farmapp.data.catalog.CatalogProductRepository
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+
+/**
+ * HU04 - Contrato del carrito de compras.
+ */
+interface CartRepository {
+
+    fun observeCart(
+        userId: String
+    ): Flow<List<CartItem>>
+
+    suspend fun addProduct(
+        userId: String,
+        sku: String,
+        quantity: Int = 1
+    ): Boolean
+
+    suspend fun changeQuantity(
+        userId: String,
+        sku: String,
+        quantity: Int
+    ): Boolean
+
+    suspend fun removeProduct(
+        userId: String,
+        sku: String
+    )
+
+    suspend fun clearCart(
+        userId: String
+    )
+}
+
+/**
+ * Implementacion offline con Room.
+ *
+ * La cuenta autenticada se comprueba antes
+ * de leer o modificar el carrito.
+ */
+class OfflineCartRepository(
+    private val dao: CartItemDao,
+    private val catalogRepository: CatalogProductRepository,
+    private val firebaseAuth: FirebaseAuth
+) : CartRepository {
+
+    private fun requireCurrentUser(userId: String) {
+        require(userId.isNotBlank()) {
+            "El identificador de usuario es obligatorio."
+        }
+
+        check(firebaseAuth.currentUser?.uid == userId) {
+            "La sesion del usuario no es valida."
+        }
+    }
+
+
+    override fun observeCart(
+        userId: String
+    ): Flow<List<CartItem>> {
+
+        requireCurrentUser(userId)
+
+        return combine(
+            dao.observeCart(userId),
+            catalogRepository.products
+        ) { cartEntities, catalogProducts ->
+
+            requireCurrentUser(userId)
+
+            val productsBySku =
+                catalogProducts.associateBy { it.sku }
+
+            cartEntities.map { entity ->
+
+                val currentProduct =
+                    productsBySku[entity.sku]
+
+                val isAvailable =
+                    currentProduct != null &&
+                            currentProduct.active &&
+                            currentProduct.stock >= entity.quantity
+
+                val hasNewPrice =
+                    currentProduct != null &&
+                            currentProduct.priceCents !=
+                            entity.unitPriceCents
+
+                if (!isAvailable || hasNewPrice) {
+                    android.util.Log.d(
+                        "FarmAppCartSync",
+                        "Revisar producto: ${entity.sku}"
+                    )
+                }
+
+
+                val availabilityMessage = when {
+                    currentProduct == null ->
+                        "Producto no disponible en el catálogo."
+
+                    !currentProduct.active ->
+                        "Este producto fue desactivado."
+
+                    currentProduct.stock == 0 ->
+                        "Producto agotado."
+
+                    currentProduct.stock < entity.quantity ->
+                        "Stock insuficiente. Disponible: ${currentProduct.stock}."
+
+                    else -> null
+                }
+
+                entity.toCartItem().copy(
+                    name = currentProduct?.name ?: entity.name,
+                    imageUrl = currentProduct?.imageUrl ?: entity.imageUrl,
+                    unitPriceCents =
+                        currentProduct?.priceCents ?: entity.unitPriceCents,
+                    priceChanged = hasNewPrice,
+                    availabilityMessage = availabilityMessage
+                )
+
+            }
+        }
+    }
+
+
+    override suspend fun addProduct(
+        userId: String,
+        sku: String,
+        quantity: Int
+    ): Boolean {
+
+        requireCurrentUser(userId)
+        require(quantity > 0) {
+            "La cantidad debe ser mayor que cero."
+        }
+
+        val product = catalogRepository.findBySku(sku)
+            ?: return false
+
+        requireCurrentUser(userId)
+
+        if (
+            !product.active ||
+            product.stock <= 0 ||
+            product.priceCents < 0
+        ) {
+            return false
+        }
+
+        val item = CartItemEntity(
+            userId = userId,
+            sku = product.sku,
+            name = product.name,
+            imageUrl = product.imageUrl,
+            unitPriceCents = product.priceCents,
+            quantity = quantity
+        )
+
+        return dao.addOrIncrement(
+            item = item,
+            availableStock = product.stock
+        )
+    }
+
+    override suspend fun changeQuantity(
+        userId: String,
+        sku: String,
+        quantity: Int
+    ): Boolean {
+
+        requireCurrentUser(userId)
+
+        if (quantity < 0) {
+            return false
+        }
+
+        if (quantity == 0) {
+            return dao.deleteItem(userId, sku) > 0
+        }
+
+        val product = catalogRepository.findBySku(sku)
+            ?: return false
+
+        requireCurrentUser(userId)
+
+        if (
+            !product.active ||
+            quantity > product.stock ||
+            product.priceCents < 0
+        ) {
+            return false
+        }
+
+        return dao.updateQuantity(
+            userId = userId,
+            sku = sku,
+            quantity = quantity
+        ) > 0
+    }
+
+    override suspend fun removeProduct(
+        userId: String,
+        sku: String
+    ) {
+        requireCurrentUser(userId)
+        dao.deleteItem(userId, sku)
+    }
+
+    override suspend fun clearCart(
+        userId: String
+    ) {
+        requireCurrentUser(userId)
+        dao.clearCart(userId)
+    }
+}
