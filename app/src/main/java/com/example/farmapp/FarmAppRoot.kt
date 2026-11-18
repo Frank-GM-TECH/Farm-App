@@ -92,6 +92,9 @@ fun FarmAppRoot(
         scope.launch {
 
             try {
+                // Antes de pedir el token, nos aseguramos de que no haya ninguna 
+                // caché de sesión previa de Google Account atascada.
+                credentialSignIn.clearCredentialState()
 
                 Log.d(
                     GOOGLE_SIGN_IN_TAG,
