@@ -16,27 +16,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
-import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
-import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
-import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.compose.cartesian.data.CartesianValueFormatter
-import com.patrykandpatrick.vico.compose.cartesian.data.columnModel
-import com.patrykandpatrick.vico.compose.cartesian.data.lineModel
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.common.ProvideVicoTheme
 import com.patrykandpatrick.vico.compose.m3.common.rememberM3VicoTheme
-import kotlin.math.abs
-import kotlin.math.roundToInt
+import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
+import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
+import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 
 /**
- * Adaptadores reutilizables para Vico 3.3.1.
+ * Adaptadores para Vico 2.3.6, versión compatible con Kotlin 2.2.21 y SDK 36.
  *
- * Las métricas siguen calculándose en DashboardMetrics y se reciben desde los
- * ViewModels existentes. Vico solo representa esos valores: no accede a Firebase.
+ * Los valores se calculan en DashboardMetrics; este archivo solo los dibuja.
+ * Vico 2 usa core.cartesian.data.columnSeries/lineSeries, no columnModel/lineModel
+ * de Vico 3. El eje horizontal comienza en índice 0.
  */
 @Composable
 fun VicoDashboardColumnChart(
@@ -63,32 +61,17 @@ private fun VicoDashboardChart(
     line: Boolean,
     modifier: Modifier = Modifier
 ) {
-    // Un valor inválido no debe llegar al motor gráfico.
     val data = entries.filter { it.value.isFinite() && it.value >= 0.0 }
-    val producer = remember { CartesianChartModelProducer() }
-    val theme = rememberM3VicoTheme()
+    val modelProducer = remember { CartesianChartModelProducer() }
 
-    LaunchedEffect(producer, data, line) {
+    LaunchedEffect(modelProducer, data, line) {
         if (data.isNotEmpty()) {
-            producer.runTransaction {
+            modelProducer.runTransaction {
                 if (line) {
-                    lineModel { series(data.map { it.value }) }
+                    lineSeries { series(data.map { it.value }) }
                 } else {
-                    columnModel { series(data.map { it.value }) }
+                    columnSeries { series(data.map { it.value }) }
                 }
-            }
-        }
-    }
-
-    // Las categorías largas se identifican con índices en el eje X y con una
-    // lista completa de etiquetas y valores debajo del gráfico.
-    val indexFormatter = remember(data) {
-        CartesianValueFormatter { _, value, _ ->
-            val index = value.roundToInt()
-            if (index in data.indices && abs(value - index) < 0.001) {
-                (index + 1).toString()
-            } else {
-                ""
             }
         }
     }
@@ -99,6 +82,7 @@ private fun VicoDashboardChart(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(title, style = MaterialTheme.typography.titleMedium)
+
             if (data.isEmpty()) {
                 Text(
                     "Todavía no hay datos para este gráfico.",
@@ -106,27 +90,23 @@ private fun VicoDashboardChart(
                 )
             } else {
                 if (data.any { it.value > 0.0 }) {
-                    ProvideVicoTheme(theme) {
+                    ProvideVicoTheme(rememberM3VicoTheme()) {
                         val chart = if (line) {
                             rememberCartesianChart(
                                 rememberLineCartesianLayer(),
                                 startAxis = VerticalAxis.rememberStart(),
-                                bottomAxis = HorizontalAxis.rememberBottom(
-                                    valueFormatter = indexFormatter
-                                )
+                                bottomAxis = HorizontalAxis.rememberBottom()
                             )
                         } else {
                             rememberCartesianChart(
                                 rememberColumnCartesianLayer(),
                                 startAxis = VerticalAxis.rememberStart(),
-                                bottomAxis = HorizontalAxis.rememberBottom(
-                                    valueFormatter = indexFormatter
-                                )
+                                bottomAxis = HorizontalAxis.rememberBottom()
                             )
                         }
                         CartesianChartHost(
                             chart = chart,
-                            modelProducer = producer,
+                            modelProducer = modelProducer,
                             modifier = Modifier.fillMaxWidth().height(230.dp)
                         )
                     }
@@ -138,7 +118,7 @@ private fun VicoDashboardChart(
                 }
 
                 Text(
-                    "Leyenda: número del eje horizontal, categoría y valor",
+                    "Leyenda: índice del eje horizontal, categoría y valor",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelSmall
                 )
@@ -148,7 +128,7 @@ private fun VicoDashboardChart(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "${index + 1}. ${item.label}",
+                            text = "${index}. ${item.label}",
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.weight(1f)
                         )
