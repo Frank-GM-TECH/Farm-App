@@ -214,7 +214,7 @@ fun CatalogDashboardScreen(state: CatalogDashboardState, onBack: () -> Unit) {
             }
             when {
                 state.isLoading -> item { CircularProgressIndicator() }
-                state.errorMessage != null -> item { ErrorNote(state.errorMessage) }
+                state.errorMessage != null -> item { ErrorNote(state.errorMessage ?: "No se pudo cargar el dashboard.") }
                 else -> {
                     val metrics = DashboardMetrics.catalog(state.products)
                     item {
@@ -289,7 +289,7 @@ fun OrdersDashboardScreen(
             }
             when {
                 state.isLoading -> item { CircularProgressIndicator() }
-                state.errorMessage != null -> item { ErrorNote(state.errorMessage) }
+                state.errorMessage != null -> item { ErrorNote(state.errorMessage ?: "No se pudo cargar el dashboard.") }
                 else -> {
                     val metrics = DashboardMetrics.orders(state.orders)
                     item {
