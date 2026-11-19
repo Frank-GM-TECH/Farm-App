@@ -37,23 +37,38 @@ ni escrituras directas de stock. Los pagos son **simulados**.
 
 `DashboardMetrics.kt` mantiene todos los cálculos de las métricas,
 independientemente de la visualización. Las tarjetas KPI utilizan Compose Material 3
-y los gráficos profesionales se representan con **Vico 3.3.1**.
+y los gráficos profesionales se representan con **Vico 2.3.6**.
 
-### Biblioteca de gráficos: Vico 3.3.1
+### Biblioteca de gráficos: Vico 2.3.6
 
-- Dependencias Gradle: `com.patrykandpatrick.vico:compose:3.3.1` y
-  `com.patrykandpatrick.vico:compose-m3:3.3.1`.
+**Nota de compatibilidad (19/11/2026):** la primera integración con Vico 3.3.1
+produjo 24 errores AAR durante `:app:checkNormalDebugAarMetadata`: Vico
+3.3.1 y Compose 1.12.0 requerían `compileSdk >= 37` y AGP 9.1.0.
+Se fijó Vico 2.3.6, publicado con Kotlin 2.2.21 y dependencias Compose 1.9.2,
+sin actualizar `compileSdk = 36`, `targetSdk`, Kotlin 2.2.21 ni AGP 8.13.2.
+Su API requiere `columnSeries`/`lineSeries` en lugar de
+`columnModel`/`lineModel`.
+
+**Estado:** cambios registrados en GitHub; todavía no existe compilación local
+confirmada con Vico 2.3.6. No confundir compatibilidad esperada con compilación
+validada.
+
+
+- Dependencias Gradle: `com.patrykandpatrick.vico:compose:2.3.6` y
+  `com.patrykandpatrick.vico:compose-m3:2.3.6`.
 - Componentes: `VicoDashboardColumnChart` y `VicoDashboardLineChart`,
   ambos definidos en `ui/dashboard/VicoDashboardCharts.kt`.
-- Vico recibe colecciones numéricas (`columnModel` o `lineModel`) mediante
+- Vico recibe colecciones numéricas (`columnSeries` o `lineSeries`) mediante
   `CartesianChartModelProducer.runTransaction`, invocado desde
   `LaunchedEffect` cuando cambian las entradas.
 - `CartesianChartHost` dibuja el gráfico; `rememberCartesianChart` junto
   con `rememberColumnCartesianLayer` o `rememberLineCartesianLayer`
-  configura las capas visuales.
+  configura las capas visuales. `CartesianChartModelProducer` y las funciones
+  `columnSeries`/`lineSeries` pertenecen al paquete
+  `com.patrykandpatrick.vico.core.cartesian.data` en Vico 2.3.6.
 - `rememberM3VicoTheme` y `ProvideVicoTheme` adaptan el gráfico a los
   colores Material 3, incluidos los temas claro y oscuro de FarmApp.
-- El eje horizontal utiliza índices numerados; debajo de cada gráfico aparecen
+- El eje horizontal utiliza índices desde cero; debajo de cada gráfico aparecen
   todas las etiquetas y sus valores exactos para no truncar categorías largas.
 - Si todos los valores son cero, el panel lo explica sin inventar columnas ni líneas.
 - **Inventario:** 2 gráficos de columnas (productos y unidades por categoría).
@@ -67,8 +82,8 @@ Function de compra, las reglas de Firestore o las configuraciones de App Check
 en esta integración de Vico.
 
 Documentación de la biblioteca:
-https://github.com/patrykandpatrick/vico/blob/master/guide/getting-started.md
-y https://github.com/patrykandpatrick/vico/blob/master/guide/cartesian-charts/cartesiancharthost.md
+https://github.com/patrykandpatrick/vico/tree/v2.3.6
+y https://mvnrepository.com/artifact/com.patrykandpatrick.vico/compose/2.3.6
 
 ## Explicación técnica para la defensa
 
@@ -103,6 +118,8 @@ git pull --ff-only origin main
 .\gradlew.bat :app:testNormalDebugUnitTest --tests "com.example.farmapp.dashboard.DashboardMetricsTest"
 .\gradlew.bat :app:assembleNormalDebug
 .\gradlew.bat :app:assemblePlayStoreDebug
+.\gradlew.bat :app:checkNormalDebugAarMetadata
+.\gradlew.bat :app:checkPlayStoreDebugAarMetadata
 ```
 
 Después:
