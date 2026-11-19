@@ -34,6 +34,10 @@ import com.example.farmapp.profile.ProfileRoute
 import com.example.farmapp.ui.account.FarmAppAccountScreen
 import com.example.farmapp.ui.auth.AuthScreen
 import com.example.farmapp.ui.background.InventoryReportRoute
+import com.example.farmapp.ui.dashboard.CatalogDashboardRoute
+import com.example.farmapp.ui.dashboard.DashboardsOverviewScreen
+import com.example.farmapp.ui.dashboard.InventoryDashboardRoute
+import com.example.farmapp.ui.dashboard.OrdersDashboardRoute
 import com.example.farmapp.ui.cart.FarmAppCartScreen
 import com.example.farmapp.ui.checkout.FarmAppOrderDetailScreen
 import com.example.farmapp.ui.checkout.FarmAppPickupStoreScreen
@@ -423,11 +427,15 @@ fun FarmAppNavHost(
                         },
 
                         onOpenOrders = {
-                            Toast.makeText(
-                                context,
-                                "Mis pedidos: próximamente",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            navController.navigate(FarmAppDestinations.DASHBOARD_ORDERS) {
+                                launchSingleTop = true
+                            }
+                        },
+
+                        onOpenDashboards = {
+                            navController.navigate(FarmAppDestinations.DASHBOARDS) {
+                                launchSingleTop = true
+                            }
                         },
 
                         onOpenFavorites = {
@@ -834,6 +842,45 @@ fun FarmAppNavHost(
         // =========================================
         // HU02: MI PERFIL
         // =========================================
+
+        // =========================================
+        // RÚBRICA 9: TRES DASHBOARDS CON DATOS REALES
+        // =========================================
+
+        composable(FarmAppDestinations.DASHBOARDS) {
+            if (uiState.isAuthenticated) {
+                DashboardsOverviewScreen(
+                    onBack = { navController.popBackStack() },
+                    onOpenInventory = {
+                        navController.navigate(FarmAppDestinations.DASHBOARD_INVENTORY)
+                    },
+                    onOpenOrders = {
+                        navController.navigate(FarmAppDestinations.DASHBOARD_ORDERS)
+                    },
+                    onOpenCatalog = {
+                        navController.navigate(FarmAppDestinations.DASHBOARD_CATALOG)
+                    }
+                )
+            }
+        }
+
+        composable(FarmAppDestinations.DASHBOARD_INVENTORY) {
+            if (uiState.isAuthenticated) {
+                InventoryDashboardRoute(onBack = { navController.popBackStack() })
+            }
+        }
+
+        composable(FarmAppDestinations.DASHBOARD_ORDERS) {
+            if (uiState.isAuthenticated) {
+                OrdersDashboardRoute(onBack = { navController.popBackStack() })
+            }
+        }
+
+        composable(FarmAppDestinations.DASHBOARD_CATALOG) {
+            if (uiState.isAuthenticated) {
+                CatalogDashboardRoute(onBack = { navController.popBackStack() })
+            }
+        }
 
         composable(FarmAppDestinations.PROFILE) {
 
