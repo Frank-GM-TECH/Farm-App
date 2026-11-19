@@ -39,6 +39,13 @@ private val spanish = Locale.forLanguageTag("es-PE")
 
 private fun soles(cents: Long): String = String.format(spanish, "S/ %.2f", cents / 100.0)
 
+private fun lastSyncLabel(time: Long): String {
+    val formatted = Instant.ofEpochMilli(time)
+        .atZone(ZoneId.systemDefault())
+        .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", spanish))
+    return "Última sincronización verificada con Firestore: $formatted"
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DashboardScaffold(
@@ -138,7 +145,10 @@ fun InventoryDashboardScreen(state: CatalogDashboardState, onBack: () -> Unit) {
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            item { SourceNote("Fuente: catálogo activo guardado en Room y sincronizado desde Firestore. Se muestran los últimos datos locales disponibles.") }
+            item { SourceNote("Fuente: productos activos verificados en Firestore y persistidos en Room. Las métricas no utilizan semillas locales sin verificar.") }
+            state.synchronizedAtMillis?.let { time ->
+                item { SourceNote(lastSyncLabel(time)) }
+            }
             when {
                 state.isLoading -> item { CircularProgressIndicator() }
                 state.errorMessage != null -> item { ErrorNote(state.errorMessage) }
@@ -198,7 +208,10 @@ fun CatalogDashboardScreen(state: CatalogDashboardState, onBack: () -> Unit) {
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            item { SourceNote("Fuente: catálogo de Room sincronizado desde Firestore. Precios expresados en soles; no se consultan pedidos de otros clientes.") }
+            item { SourceNote("Fuente: instantánea verificada de Firestore, también guardada en Room. Precios en soles; no se consultan pedidos de otros clientes.") }
+            state.synchronizedAtMillis?.let { time ->
+                item { SourceNote(lastSyncLabel(time)) }
+            }
             when {
                 state.isLoading -> item { CircularProgressIndicator() }
                 state.errorMessage != null -> item { ErrorNote(state.errorMessage) }
