@@ -56,6 +56,23 @@
                 )
             }
 
+            // Variante de publicacion: se mantiene separada de normalDebug.
+            // El applicationId es provisional hasta registrar la ficha en Google Play.
+            // Requiere app/src/playStore/google-services.json de farm-app-c5291
+            // con un cliente Android para com.frankgmtech.farmapp.
+            create("playStore") {
+                dimension = "environment"
+                applicationId = "com.frankgmtech.farmapp"
+
+                // playStoreRelease usa Play Integrity por ser una compilacion release.
+                // playStoreDebug conserva el proveedor Debug hasta configurar App Check.
+                buildConfigField(
+                    "boolean",
+                    "USE_PLAY_INTEGRITY_APP_CHECK",
+                    "false"
+                )
+            }
+
             create("hu04Test") {
                 dimension = "environment"
 
