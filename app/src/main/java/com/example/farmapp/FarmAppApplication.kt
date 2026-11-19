@@ -17,6 +17,7 @@ import com.google.firebase.storage.FirebaseStorage
 
 import com.google.firebase.appcheck.appCheck
 import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.initialize
 
 class FarmAppApplication : Application() {
@@ -35,16 +36,25 @@ class FarmAppApplication : Application() {
         // 2. Mostrar en Logcat qué proyecto Firebase está utilizando la app.
         logFirebaseConfiguration()
 
-        // 3. Instalar App Check Debug en las compilaciones de desarrollo.
-        if (BuildConfig.DEBUG) {
+        // 3. App Check: Play Integrity en builds reales autorizados.
+        // normalDebug mantiene Debug hasta terminar la configuración de Firebase
+        // y activar USE_PLAY_INTEGRITY_APP_CHECK en el flavor normal.
+        // hu04TestDebug continúa con Debug y Firebase Emulator.
+        val usePlayIntegrity =
+            !BuildConfig.DEBUG ||
+                    (BuildConfig.FLAVOR == "normal" &&
+                            BuildConfig.USE_PLAY_INTEGRITY_APP_CHECK)
+
+        if (usePlayIntegrity) {
+            Firebase.appCheck.installAppCheckProviderFactory(
+                PlayIntegrityAppCheckProviderFactory.getInstance()
+            )
+            Log.i("FarmAppAppCheck", "Proveedor Play Integrity instalado")
+        } else {
             Firebase.appCheck.installAppCheckProviderFactory(
                 DebugAppCheckProviderFactory.getInstance()
             )
-
-            Log.i(
-                "AppCheckTest",
-                "Proveedor Debug de App Check instalado"
-            )
+            Log.i("FarmAppAppCheck", "Proveedor Debug instalado")
         }
 
         // 4. Solo HU04 Test Debug utiliza Firebase Emulator.
