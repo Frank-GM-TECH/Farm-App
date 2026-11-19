@@ -9,8 +9,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+
+/**
+ * Instantánea cuya procedencia del servidor quedó confirmada.
+ * Se publica solo después de guardar correctamente los mismos productos en Room.
+ */
+data class VerifiedCatalogSnapshot(
+    val userId: String,
+    val products: List<CatalogProductEntity>,
+    val synchronizedAtMillis: Long
+)
 
 /**
  * Escucha los productos activos de Firestore y actualiza la caché Room.
@@ -29,6 +42,9 @@ class CatalogRealtimeSync(
     private var generation = 0L
     private var started = false
 
+    private val _verifiedSnapshot = MutableStateFlow<VerifiedCatalogSnapshot?>(null)
+    val verifiedSnapshot: StateFlow<VerifiedCatalogSnapshot?> = _verifiedSnapshot.asStateFlow()
+
     private val authListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
         listenFor(firebaseAuth.currentUser?.uid)
     }
@@ -46,6 +62,7 @@ class CatalogRealtimeSync(
         registration?.remove()
         registration = null
         listenerUserId = null
+        _verifiedSnapshot.value = null
         generation++
         scope.cancel()
     }
@@ -55,6 +72,8 @@ class CatalogRealtimeSync(
         registration?.remove()
         registration = null
         listenerUserId = uid
+        // Una nueva sesión no puede reutilizar resultados de otra cuenta.
+        _verifiedSnapshot.value = null
         generation++
         val currentGeneration = generation
         if (uid == null) return
@@ -105,6 +124,11 @@ class CatalogRealtimeSync(
                         if (started && generation == currentGeneration && auth.currentUser?.uid == uid) {
                             try {
                                 dao.replaceActiveSnapshot(parsed)
+                                _verifiedSnapshot.value = VerifiedCatalogSnapshot(
+                                    userId = uid,
+                                    products = parsed,
+                                    synchronizedAtMillis = System.currentTimeMillis()
+                                )
                             } catch (e: Exception) {
                                 Log.e("FarmAppCatalogSync", "Error al actualizar Room", e)
                             }
