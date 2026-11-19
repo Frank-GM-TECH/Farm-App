@@ -7,6 +7,10 @@ object FarmAppDestinations {
     const val CATALOG = "catalog"
     const val CATEGORIES = "categories"
     const val ACCOUNT = "account"
+    const val DASHBOARDS = "dashboards"
+    const val DASHBOARD_INVENTORY = "dashboards/inventory"
+    const val DASHBOARD_ORDERS = "dashboards/orders"
+    const val DASHBOARD_CATALOG = "dashboards/catalog"
     const val BARCODE_SCANNER = "barcode_scanner"
     // HU04 - Carrito de compras.
     const val CART = "cart"
