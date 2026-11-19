@@ -35,9 +35,40 @@ consulta únicamente la subcolección de pedidos del usuario autenticado y
 comprueba el UID de la sesión. No se habilitaron lecturas de pedidos globales,
 ni escrituras directas de stock. Los pagos son **simulados**.
 
-`DashboardMetrics.kt` contiene cálculos puros y verificables; las vistas son
-Jetpack Compose + Material 3, con tarjetas KPI y barras horizontales construidas
-con primitivas de Compose, sin depender de servicios de gráficos externos.
+`DashboardMetrics.kt` mantiene todos los cálculos de las métricas,
+independientemente de la visualización. Las tarjetas KPI utilizan Compose Material 3
+y los gráficos profesionales se representan con **Vico 3.3.1**.
+
+### Biblioteca de gráficos: Vico 3.3.1
+
+- Dependencias Gradle: `com.patrykandpatrick.vico:compose:3.3.1` y
+  `com.patrykandpatrick.vico:compose-m3:3.3.1`.
+- Componentes: `VicoDashboardColumnChart` y `VicoDashboardLineChart`,
+  ambos definidos en `ui/dashboard/VicoDashboardCharts.kt`.
+- Vico recibe colecciones numéricas (`columnModel` o `lineModel`) mediante
+  `CartesianChartModelProducer.runTransaction`, invocado desde
+  `LaunchedEffect` cuando cambian las entradas.
+- `CartesianChartHost` dibuja el gráfico; `rememberCartesianChart` junto
+  con `rememberColumnCartesianLayer` o `rememberLineCartesianLayer`
+  configura las capas visuales.
+- `rememberM3VicoTheme` y `ProvideVicoTheme` adaptan el gráfico a los
+  colores Material 3, incluidos los temas claro y oscuro de FarmApp.
+- El eje horizontal utiliza índices numerados; debajo de cada gráfico aparecen
+  todas las etiquetas y sus valores exactos para no truncar categorías largas.
+- Si todos los valores son cero, el panel lo explica sin inventar columnas ni líneas.
+- **Inventario:** 2 gráficos de columnas (productos y unidades por categoría).
+- **Mis pedidos:** 1 gráfico de líneas (importe mensual) y 1 de columnas
+  (cantidad de pedidos por mes).
+- **Análisis del catálogo:** 2 gráficos de columnas (rangos de precios y
+  precio medio por categoría).
+
+No se modificaron los ViewModels, los cálculos de negocio, las rutas, la Cloud
+Function de compra, las reglas de Firestore o las configuraciones de App Check
+en esta integración de Vico.
+
+Documentación de la biblioteca:
+https://github.com/patrykandpatrick/vico/blob/master/guide/getting-started.md
+y https://github.com/patrykandpatrick/vico/blob/master/guide/cartesian-charts/cartesiancharthost.md
 
 ## Explicación técnica para la defensa
 
@@ -57,6 +88,12 @@ con primitivas de Compose, sin depender de servicios de gráficos externos.
   `createdAtMillis` en la zona horaria del dispositivo.
 
 ## Pruebas en Android Studio
+
+Las variantes reciben Vico porque ambas dependen de `app/src/main` y las
+nuevas dependencias están declaradas en `app/build.gradle.kts` sin limitar
+el flavor. Para la exposición, verificar que las barras se actualicen
+después de la sincronización de Firestore y que la línea de importes cambie
+si se recuperan pedidos de otro mes.
 
 Desde la raíz del proyecto, ejecutar en PowerShell:
 
@@ -85,7 +122,8 @@ Después:
 ## Limitaciones y precauciones
 
 - No se han ejecutado compilaciones Android ni pruebas de teléfono desde el
-  conector de GitHub; deben comprobarse en Android Studio.
+  conector de GitHub; el resultado del build y las pruebas reales todavía
+  deben comprobarse en Android Studio.
 - `normalDebug` y `playStoreRelease` reutilizan el mismo backend actual;
   no se modificó `functions/src/index.ts`, reglas de Firestore o App Check.
 - En una instalación sin conectividad previa verificada, los dashboards del
