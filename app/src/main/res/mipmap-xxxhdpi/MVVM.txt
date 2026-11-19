@@ -1,0 +1,12 @@
+MVVM
+
+Profesora, utilizamos la arquitectura MVVM para separar las responsabilidades de nuestra aplicación. La vista,
+ desarrollada con Jetpack Compose, se encarga de mostrar la interfaz y detectar las acciones del usuario.
+
+Cuando presionamos Agregar al carrito, la vista comunica esa acción al CartViewModel. Este coordina la operación
+ mediante un repositorio, que valida los datos y utiliza Room para acceder a la base de datos.
+
+MVVM significa:
+- M — Model (Modelo): administra los datos y la lógica de negocio.
+- V — View (Vista): muestra la interfaz con la que interactúa el usuario.
+- VM — ViewModel (Modelo de Vista): conecta la vista con la lógica de negocio y administra el estado que se muestra.
