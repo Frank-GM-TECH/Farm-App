@@ -25,6 +25,7 @@ import com.example.farmapp.catalog.InMemoryCatalogRepository
 
 import com.example.farmapp.data.catalog.CatalogDatabase
 import com.example.farmapp.data.catalog.CatalogProductRepository
+import com.example.farmapp.data.catalog.CatalogRealtimeSync
 import com.example.farmapp.data.catalog.OfflineCatalogProductRepository
 
 // =========================================
@@ -174,6 +175,9 @@ interface AppContainer {
 
     val catalogProductRepository: CatalogProductRepository
 
+    // Instantánea Firestore verificada, reutilizada por los dashboards.
+    val catalogRealtimeSync: CatalogRealtimeSync
+
     // =====================================
     // HU04 - CARRITO CON ROOM
     // =====================================
@@ -243,8 +247,8 @@ class DefaultAppContainer(
             .addMigrations(CatalogDatabase.MIGRATION_1_2)
             .build()
     }
-    val catalogRealtimeSync: com.example.farmapp.data.catalog.CatalogRealtimeSync by lazy {
-        com.example.farmapp.data.catalog.CatalogRealtimeSync(
+    override val catalogRealtimeSync: CatalogRealtimeSync by lazy {
+        CatalogRealtimeSync(
             firestore = FirebaseFirestore.getInstance(),
             auth = FirebaseAuth.getInstance(),
             dao = catalogDatabase.catalogProductDao()
