@@ -1,0 +1,24 @@
+PORQUE SE CAMBIO AL FIREBASE EMULATOR
+
+«Profesora, inicialmente utilizamos Firebase real en la nube para desarrollar nuestras tres primeras historias de usuario,
+ donde implementamos la autenticación, gestión de perfiles y consulta del catálogo de productos.
+
+Sin embargo, al desarrollar la HU04, necesitábamos implementar un proceso de compras que registra pedidos y modifica el 
+stock de los productos.
+
+Por ello decidimos incorporar Firebase Emulator Suite, que nos permite simular localmente los servicios de Firebase y
+ probar las compras sin afectar los datos almacenados en la nube.
+
+También configuramos un respaldo maestro para restaurar el inventario y repetir nuestras pruebas.
+
+Es importante mencionar que no dejamos de utilizar Firebase; simplemente cambiamos el entorno de ejecución para realizar
+ pruebas controladas de nuestra aplicación».
+
+Y si tu profesora te pregunta «¿Por qué no utilizaron Firebase Emulator desde la primera historia?», puedes responder:
+
+«Porque inicialmente necesitábamos implementar y comprobar la integración directa con los servicios de Firebase en la nube. 
+Cuando llegamos a la HU04, las operaciones se volvieron más delicadas, debido al registro de pedidos y la modificación del 
+inventario. Por eso consideramos más conveniente realizar esas pruebas en un entorno local aislado».
+
+Esta explicación justifica el cambio como una decisión técnica durante la evolución del proyecto, y no como una falla de 
+Firebase real.
