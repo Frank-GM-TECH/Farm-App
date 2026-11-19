@@ -301,7 +301,7 @@ fun OrdersDashboardScreen(
                     item {
                         VicoDashboardLineChart(
                             title = "Importe de pedidos por mes (últimos 6 meses)",
-                            bars = metrics.monthly.map { month ->
+                            points = metrics.monthly.map { month ->
                                 DashboardBar(
                                     month.month.format(DateTimeFormatter.ofPattern("MMM yy", spanish)),
                                     month.amountCents.toDouble(),
