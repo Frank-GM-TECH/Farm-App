@@ -116,8 +116,8 @@
     val workVersion = "2.11.2"
     val navigationVersion = "2.9.8"
     val cameraXVersion = "1.5.3"
-    // Vico Compose 3.3.1 (estable): gráficos profesionales para dashboards.
-    val vicoVersion = "3.3.1"
+    // Vico 2.3.6: compatible con Kotlin 2.2.21, Compose 1.9.x y compileSdk 36.
+    val vicoVersion = "2.3.6"
 
     // Dependencias de los 32 cotejos, centralizadas en un solo lugar.
     dependencies {
