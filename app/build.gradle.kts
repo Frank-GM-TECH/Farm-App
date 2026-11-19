@@ -63,6 +63,9 @@
             create("playStore") {
                 dimension = "environment"
                 applicationId = "com.frankgmtech.farmapp"
+                // Google Play exige API 36 para nuevas apps desde agosto de 2026.
+                // Se aplica solo a Play Store; normalDebug conserva targetSdk 35.
+                targetSdk = 36
 
                 // playStoreRelease usa Play Integrity por ser una compilacion release.
                 // playStoreDebug conserva el proveedor Debug hasta configurar App Check.
