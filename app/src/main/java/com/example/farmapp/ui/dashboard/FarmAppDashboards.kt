@@ -151,7 +151,7 @@ fun InventoryDashboardScreen(state: CatalogDashboardState, onBack: () -> Unit) {
             }
             when {
                 state.isLoading -> item { CircularProgressIndicator() }
-                state.errorMessage != null -> item { ErrorNote(state.errorMessage) }
+                state.errorMessage != null -> item { ErrorNote(state.errorMessage ?: "Error al cargar datos") }
                 else -> {
                     val metrics = DashboardMetrics.inventory(state.products)
                     item {
@@ -322,9 +322,9 @@ fun OrdersDashboardScreen(
                             }
                         )
                     }
-                    if (metrics.latest != null) {
+                    val latest = metrics.latest
+                    if (latest != null) {
                         item {
-                            val latest = metrics.latest
                             val dateText = if (latest.createdAtMillis > 0L) {
                                 Instant.ofEpochMilli(latest.createdAtMillis)
                                     .atZone(ZoneId.systemDefault())
