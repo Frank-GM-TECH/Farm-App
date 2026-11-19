@@ -64,6 +64,44 @@ Guías oficiales:
 - https://developer.android.com/studio/publish/app-signing
 - https://developers.google.com/android/guides/client-auth
 
+
+## Evidencia nueva: certificados públicos descargados de Play Console (19/11/2026)
+
+Se recibió `certificates.zip` con **tres certificados públicos X.509**, sin
+claves privadas. Se calcularon las huellas SHA-1 y SHA-256 sobre el contenido
+DER original de cada certificado. Estos valores pueden registrarse con un
+proveedor de API; no subir el ZIP a GitHub.
+
+| Certificado público | SHA-1 | SHA-256 |
+| --- | --- | --- |
+| `deployment_cert.der` (firma clásica para dispositivos Android anteriores a 17) | `0E:39:B9:BA:1B:BA:3B:87:E2:5E:37:D2:15:0A:94:C7:7A:5B:29:B5` | `2D:50:4B:4C:42:82:08:9F:5D:B2:F8:9D:14:46:42:6E:4B:21:CE:97:75:14:20:85:13:49:D7:78:BC:1F:FD:82` |
+| `hybrid_classical_cert.der` (firma clásica en esquema híbrido Android 17+) | `DC:4A:5A:89:34:E4:BA:BE:3E:BD:58:D1:E0:D4:CF:92:6E:E5:20:0F` | `E6:EE:DA:98:F4:A0:04:F6:C9:6C:65:D0:B2:FF:14:62:58:23:35:81:A9:0D:CB:E3:BE:90:5D:D8:DC:F6:49:8C` |
+| `hybrid_pqc_cert.der` (firma poscuántica en esquema híbrido Android 17+) | `75:19:7A:8F:40:59:E5:A7:65:41:91:A2:35:AF:50:32:D1:0B:C2:85` | `5F:B9:C3:C7:23:F0:17:75:48:04:C9:72:7C:37:3E:DA:99:CB:DB:0E:C1:4F:CD:64:2E:9A:91:1F:A1:F9:94:BA` |
+
+**Comparación verificable:** en el JSON actual de `main`, el cliente
+`com.frankgmtech.farmapp` contiene solo una SHA-1 OAuth Android,
+`DA:A8:17:1F:A2:23:5D:C4:2B:BB:6E:D6:88:40:EB:1E:E2:CB:B9:15`.
+**No coincide con ninguna de las tres huellas de Play App Signing.**
+Esto proporciona una causa altamente probable del fallo de Google Sign-In en
+la aplicación instalada mediante Google Play.
+
+**Acción pendiente exclusivamente en Firebase Console:** abrir la app Android
+`com.frankgmtech.farmapp` del proyecto `farm-app-c5291`; conservar todas las
+huellas existentes; agregar las SHA-1 y SHA-256 de `deployment_cert.der` y,
+de acuerdo con la guía de firma híbrida de Google Play, también las huellas
+clásica y poscuántica. Verificar que el proveedor Google esté habilitado.
+Después descargar el JSON actualizado y comprobar que contiene clientes OAuth
+Android para las SHA-1 registradas. Solo entonces sustituir el archivo
+`app/src/playStore/google-services.json` mediante un commit separado.
+
+**Prueba previa al AAB:** después del registro de huellas, abrir la versión
+que ya está instalada desde Google Play y probar el botón Google. El cambio
+del registro OAuth es del lado del servidor y puede resolver el fallo sin
+nueva versión. Si persiste, recopilar el tipo de error sin compartir tokens.
+
+Fuente oficial sobre las tres huellas híbridas:
+https://support.google.com/googleplay/android-developer/answer/9842756
+
 ## Ajustes de código registrados en `main`
 
 - `FarmAppRoot.kt`: no limpia `CredentialManager` antes de cada intento de
