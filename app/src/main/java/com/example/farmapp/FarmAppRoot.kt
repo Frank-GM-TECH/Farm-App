@@ -92,9 +92,9 @@ fun FarmAppRoot(
         scope.launch {
 
             try {
-                // Antes de pedir el token, nos aseguramos de que no haya ninguna 
-                // caché de sesión previa de Google Account atascada.
-                credentialSignIn.clearCredentialState()
+                // La limpieza de Credential Manager solo corresponde al cierre
+                // de sesión. Hacerla antes de cada selección puede invalidar
+                // el estado del proveedor o impedir que se abra el selector.
 
                 Log.d(
                     GOOGLE_SIGN_IN_TAG,
@@ -120,7 +120,7 @@ fun FarmAppRoot(
 
                 Log.d(
                     GOOGLE_SIGN_IN_TAG,
-                    "El AuthViewModel terminó de procesar la solicitud."
+                    "Token entregado al AuthViewModel; Firebase procesará la sesión."
                 )
 
             } catch (cancelled: GetCredentialCancellationException) {
