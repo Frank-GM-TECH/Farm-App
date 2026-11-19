@@ -1,0 +1,22 @@
+SQL
+
+¿Cómo se lo dices a tu profesora?
+«Profesora, sí utilizamos SQL en FarmApp. La base de datos es SQLite, pero trabajamos con ella mediante la biblioteca Room.
+ Definimos nuestras consultas SQL en las DAO usando @Query, y Room también nos permite insertar, actualizar o eliminar 
+registros mediante anotaciones como @Upsert».
+
+La diferencia es que Room no reemplaza a SQLite, sino que facilita trabajar con él.
+- Room: es una biblioteca de Android que permite trabajar con SQLite de manera más sencilla y segura.
+- DAO: es donde definimos las operaciones de acceso a la base de datos.
+Por ejemplo, en tu CartItemDao.kt:
+@Query("SELECT * FROM cart_items WHERE userId = :userId")
+fun observeCart(userId: String): Flow<List<CartItemEntity>>
+
+
+Aquí estamos utilizando SQL dentro de Room para obtener los productos del carrito de un usuario.
+
+Y cuando usamos:
+@Upsert
+suspend fun upsert(item: CartItemEntity)
+
+
