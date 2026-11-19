@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.credentials.CredentialManager
 import androidx.credentials.exceptions.GetCredentialCancellationException
+import androidx.credentials.exceptions.GetCredentialException
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -107,7 +108,7 @@ fun FarmAppRoot(
                 // Nunca registrar el contenido del token.
                 Log.d(
                     GOOGLE_SIGN_IN_TAG,
-                    "Token de Google obtenido correctamente. Longitud: ${token.length}"
+                    "Google devolvió un ID token; no se registrará su contenido."
                 )
 
                 Log.d(
@@ -151,13 +152,24 @@ fun FarmAppRoot(
 
                 throw cancelled
 
-            } catch (error: Exception) {
+            } catch (credentialError: GetCredentialException) {
 
+                // Error seguro del proveedor, útil al investigar OAuth en
+                // una instalación firmada por Google Play.
                 Log.e(
                     GOOGLE_SIGN_IN_TAG,
-                    "ERROR al obtener las credenciales de Google: " +
-                            "${error.javaClass.name}: ${error.message}",
-                    error
+                    "Credential Manager falló: tipo=${credentialError.type}, " +
+                        "clase=${credentialError.javaClass.simpleName}"
+                )
+                authViewModel.reportGoogleCredentialError()
+
+            } catch (error: Exception) {
+
+                // Evitar volcar mensajes o excepciones que puedan contener
+                // datos privados de la cuenta seleccionada.
+                Log.e(
+                    GOOGLE_SIGN_IN_TAG,
+                    "Error inesperado de Google Sign-In: ${error.javaClass.name}"
                 )
 
                 authViewModel.reportGoogleCredentialError()
