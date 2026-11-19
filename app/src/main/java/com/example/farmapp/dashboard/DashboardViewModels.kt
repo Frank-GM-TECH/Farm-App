@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.farmapp.data.catalog.CatalogProductEntity
-import com.example.farmapp.data.catalog.CatalogProductRepository
+import com.example.farmapp.data.catalog.CatalogRealtimeSync
 import com.example.farmapp.data.farmAppContainer
 import com.example.farmapp.data.orders.FarmOrder
 import com.example.farmapp.data.orders.OrderRepository
@@ -20,15 +20,17 @@ import kotlinx.coroutines.launch
 data class CatalogDashboardState(
     val products: List<CatalogProductEntity> = emptyList(),
     val isLoading: Boolean = true,
+    val synchronizedAtMillis: Long? = null,
     val errorMessage: String? = null
 )
 
 /**
- * Usa el mismo Flow de Room que el catálogo comercial. El sincronizador existente
- * Firestore -> Room actualiza automáticamente las pantallas cuando cambia el stock.
+ * Consume el sincronizador Firestore -> Room que ya inicia FarmAppApplication.
+ * No representa como reales los productos de semilla local antes de una lectura
+ * confirmada del servidor para la sesión actual.
  */
 class CatalogDashboardViewModel(
-    private val repository: CatalogProductRepository
+    private val sync: CatalogRealtimeSync
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CatalogDashboardState())
     val uiState: StateFlow<CatalogDashboardState> = _uiState.asStateFlow()
@@ -36,18 +38,26 @@ class CatalogDashboardViewModel(
     init {
         viewModelScope.launch {
             try {
-                repository.products.collect { products ->
-                    _uiState.value = CatalogDashboardState(
-                        products = products,
-                        isLoading = false
-                    )
+                sync.verifiedSnapshot.collect { snapshot ->
+                    _uiState.value = if (snapshot == null) {
+                        CatalogDashboardState(
+                            isLoading = false,
+                            errorMessage = "Sin datos verificados de Firestore. Conéctate a Internet y espera la sincronización del catálogo."
+                        )
+                    } else {
+                        CatalogDashboardState(
+                            products = snapshot.products,
+                            isLoading = false,
+                            synchronizedAtMillis = snapshot.synchronizedAtMillis
+                        )
+                    }
                 }
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (_: Exception) {
                 _uiState.value = CatalogDashboardState(
                     isLoading = false,
-                    errorMessage = "No se pudo leer el catálogo local."
+                    errorMessage = "No se pudo consultar la sincronización del catálogo."
                 )
             }
         }
@@ -57,7 +67,7 @@ class CatalogDashboardViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 CatalogDashboardViewModel(
-                    this.farmAppContainer().catalogProductRepository
+                    this.farmAppContainer().catalogRealtimeSync
                 )
             }
         }
