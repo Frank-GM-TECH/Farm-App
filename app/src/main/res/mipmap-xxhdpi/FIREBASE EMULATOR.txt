@@ -1,0 +1,36 @@
+1. ¿Qué es FIREBASE EMULATOR?
+
+
+
+Firebase Emulator es una herramienta que nos permite simular los servicios de Firebase en nuestra propia computadora,
+ sin tener que utilizar los servicios reales alojados en la nube.
+
+
+
+Por ejemplo, FarmApp necesita registrar usuarios, guardar perfiles, consultar productos y procesar pedidos.
+
+Con Firebase Emulator podemos probar esas operaciones localmente.
+
+2. ¿Por qué lo utilizamos en FarmApp?
+Hay cuatro razones fundamentales.
+Primera: evitar modificar datos de producción
+Imagina que durante tu exposición realizas diez compras para demostrar el carrito.
+
+Si usaras una base de datos real de producción, podrías modificar el inventario que utilizan los usuarios de una aplicación publicada.
+
+Con Firebase Emulator, las compras modifican únicamente los datos del entorno local de pruebas.
+Segunda: probar las compras sin realizar pagos reales
+En FarmApp, la historia HU04 permite seleccionar un método de pago, un comprobante y confirmar una compra de demostración.
+
+Pero no procesa dinero real ni realiza una transacción bancaria.
+
+Con Cloud Functions Emulator podemos comprobar que el pedido se registra y que el stock se descuenta correctamente sin poner en funcionamiento un sistema de cobro real.
+Tercera: repetir las pruebas
+Esta razón se relaciona directamente con el respaldo maestro que configuramos en ambas laptops.
+
+Por ejemplo, imagina que el stock inicial del alcohol en gel es de 20 unidades.
+
+FARMAPPAPLICATION
+if (BuildConfig.DEBUG && BuildConfig.FLAVOR == "hu04Test") {
+    configureFirebaseEmulators()
+}
