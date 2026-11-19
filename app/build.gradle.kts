@@ -116,6 +116,8 @@
     val workVersion = "2.11.2"
     val navigationVersion = "2.9.8"
     val cameraXVersion = "1.5.3"
+    // Vico Compose 3.3.1 (estable): gráficos profesionales para dashboards.
+    val vicoVersion = "3.3.1"
 
     // Dependencias de los 32 cotejos, centralizadas en un solo lugar.
     dependencies {
@@ -130,6 +132,8 @@
         implementation("androidx.compose.foundation:foundation")
         implementation("androidx.compose.animation:animation")
         implementation("androidx.compose.material3:material3")
+        implementation("com.patrykandpatrick.vico:compose:$vicoVersion")
+        implementation("com.patrykandpatrick.vico:compose-m3:$vicoVersion")
         implementation("androidx.compose.material3:material3-window-size-class")
         implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
