@@ -1,0 +1,8 @@
+PROCESOS DE NEGOCIO
+
+¿Qué decirle a tu profesora?
+«Profesora, hemos identificado tres procesos de negocio principales en FarmApp: gestión de clientes, gestión del catálogo
+ de productos y gestión de pedidos.
+
+El primero administra la identificación y los datos de los clientes. El segundo permite consultar los productos y su 
+disponibilidad. Finalmente, el tercero gestiona la selección de artículos, validación del stock y registro de pedidos.
