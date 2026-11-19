@@ -167,7 +167,7 @@ fun InventoryDashboardScreen(state: CatalogDashboardState, onBack: () -> Unit) {
                         }
                     }
                     item {
-                        DashboardBarChart(
+                        VicoDashboardColumnChart(
                             title = "Cantidad de productos por categoría",
                             bars = metrics.categories.map {
                                 DashboardBar(it.name, it.productCount.toDouble(), it.productCount.toString())
@@ -175,7 +175,7 @@ fun InventoryDashboardScreen(state: CatalogDashboardState, onBack: () -> Unit) {
                         )
                     }
                     item {
-                        DashboardBarChart(
+                        VicoDashboardColumnChart(
                             title = "Unidades disponibles por categoría",
                             bars = metrics.categories.map {
                                 DashboardBar(it.name, it.availableUnits.toDouble(), it.availableUnits.toString())
@@ -230,7 +230,7 @@ fun CatalogDashboardScreen(state: CatalogDashboardState, onBack: () -> Unit) {
                         }
                     }
                     item {
-                        DashboardBarChart(
+                        VicoDashboardColumnChart(
                             title = "Distribución de productos por precio",
                             bars = metrics.priceRanges.map { (name, count) ->
                                 DashboardBar(name, count.toDouble(), count.toString())
@@ -238,7 +238,7 @@ fun CatalogDashboardScreen(state: CatalogDashboardState, onBack: () -> Unit) {
                         )
                     }
                     item {
-                        DashboardBarChart(
+                        VicoDashboardColumnChart(
                             title = "Precio promedio por categoría",
                             bars = metrics.categories.map {
                                 DashboardBar(
@@ -299,7 +299,7 @@ fun OrdersDashboardScreen(
                         }
                     }
                     item {
-                        DashboardBarChart(
+                        VicoDashboardLineChart(
                             title = "Importe de pedidos por mes (últimos 6 meses)",
                             bars = metrics.monthly.map { month ->
                                 DashboardBar(
@@ -311,7 +311,7 @@ fun OrdersDashboardScreen(
                         )
                     }
                     item {
-                        DashboardBarChart(
+                        VicoDashboardColumnChart(
                             title = "Cantidad de pedidos por mes",
                             bars = metrics.monthly.map { month ->
                                 DashboardBar(
