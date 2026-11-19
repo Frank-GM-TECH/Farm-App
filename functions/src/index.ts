@@ -3,6 +3,7 @@ import {setGlobalOptions} from "firebase-functions/v2";
 import {onCall, HttpsError} from "firebase-functions/v2/https";
 import {initializeApp} from "firebase-admin/app";
 import {getFirestore} from "firebase-admin/firestore";
+import {defineBoolean} from "firebase-functions/params";
 
 setGlobalOptions({
   region: "us-central1",
@@ -12,6 +13,11 @@ setGlobalOptions({
 initializeApp();
 
 const db = getFirestore();
+
+// Interruptor de seguridad de HU04: desactivado por defecto en Firebase real.
+const allowRealOrders = defineBoolean("ALLOW_REAL_ORDERS", {
+  default: false,
+});
 
 interface OrderItemInput {
   sku: string;
@@ -32,25 +38,39 @@ interface CreateOrderInput {
 }
 
 export const createOrder = onCall(
-  {enforceAppCheck: false},
+  {
+    // En producción, solo clientes con App Check válido podrán confirmar pedidos.
+    // En el emulador se mantienen las pruebas de HU04 sin tokens reales.
+    enforceAppCheck: process.env.FUNCTIONS_EMULATOR !== "true",
+  },
   async (request) => {
-    // Protección temporal: no permitir escrituras en producción.
-    if (
-      process.env.FUNCTIONS_EMULATOR !== "true" ||
-      !process.env.FIRESTORE_EMULATOR_HOST
-    ) {
+    const functionsEmulated = process.env.FUNCTIONS_EMULATOR === "true";
+    const firestoreEmulated = Boolean(process.env.FIRESTORE_EMULATOR_HOST);
+
+    // Nunca combinar Functions Emulator con Firestore real, ni a la inversa.
+    if (functionsEmulated !== firestoreEmulated) {
       throw new HttpsError(
         "failed-precondition",
-        "El registro de pedidos solo está habilitado en emuladores."
+        "Configuración incompleta de los emuladores de Firebase."
       );
     }
 
+    // Las cuentas Firebase reales y emuladas deben estar autenticadas.
     const uid = request.auth?.uid;
 
     if (!uid) {
       throw new HttpsError(
         "unauthenticated",
         "Debes iniciar sesión para registrar un pedido."
+      );
+    }
+
+    // Deshabilitado por defecto: el primer despliegue no alterará stock real.
+    // Al habilitarlo, se admite cualquier UID autenticado (sin lista temporal).
+    if (!functionsEmulated && !allowRealOrders.value()) {
+      throw new HttpsError(
+        "failed-precondition",
+        "Los pedidos en Firebase real todavía no están habilitados."
       );
     }
 
