@@ -43,7 +43,8 @@ fun FarmAppAccountScreen(
     onOpenRoomDemo: () -> Unit,
     onOpenBackgroundReport: () -> Unit,
     onOpenLegacyViews: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onOpenDashboards: () -> Unit = {}
 ) {
     var showTechnicalTools by rememberSaveable {
         mutableStateOf(false)
@@ -187,6 +188,16 @@ fun FarmAppAccountScreen(
                 subtitle = "Nombre, teléfono, dirección y fotografía",
                 icon = Icons.Filled.Person,
                 onClick = onOpenProfile
+            )
+        }
+
+        // La profesora puede identificar claramente los tres dashboards desde Cuenta.
+        item {
+            AccountMenuOption(
+                title = "Paneles de análisis",
+                subtitle = "Inventario, mis pedidos y análisis del catálogo",
+                icon = Icons.Filled.Inventory2,
+                onClick = onOpenDashboards
             )
         }
 
