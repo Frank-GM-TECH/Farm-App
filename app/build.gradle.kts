@@ -45,10 +45,26 @@
 
             create("normal") {
                 dimension = "environment"
+
+                // Cambiar a true solo después de configurar Play Integrity
+                // para la APK instalada fuera de Google Play.
+                // false mantiene normalDebug operativo con App Check Debug.
+                buildConfigField(
+                    "boolean",
+                    "USE_PLAY_INTEGRITY_APP_CHECK",
+                    "false"
+                )
             }
 
             create("hu04Test") {
                 dimension = "environment"
+
+                // HU04 conserva su proveedor App Check de depuración.
+                buildConfigField(
+                    "boolean",
+                    "USE_PLAY_INTEGRITY_APP_CHECK",
+                    "false"
+                )
 
                 applicationIdSuffix = ".hu04test"
                 versionNameSuffix = "-HU04-TEST"
@@ -160,6 +176,7 @@
 
         implementation("com.google.firebase:firebase-appcheck")
         implementation("com.google.firebase:firebase-appcheck-debug")
+        implementation("com.google.firebase:firebase-appcheck-playintegrity")
 
 
         testImplementation("junit:junit:4.13.2")
