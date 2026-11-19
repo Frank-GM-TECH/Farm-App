@@ -1,0 +1,18 @@
+INDEX
+
+
+6. ¿Qué decirle a tu profesora?
+«Profesora, el archivo INDEX.TS contiene nuestra lógica de backend, desarrollada en TypeScript mediante Firebase Cloud Functions.
+
+Su función principal es validar y registrar los pedidos de FarmApp. Cuando el usuario confirma una compra desde Android, la aplicación envía la solicitud al servidor.
+
+El servidor verifica que el usuario esté autenticado, comprueba el stock y los precios registrados en Firestore, calcula el total y utiliza una transacción para guardar el pedido y descontar el inventario.
+
+Además, implementamos un mecanismo de idempotencia para evitar pedidos duplicados y una protección que limita las compras al entorno de pruebas.
+
+De esta manera separamos la lógica de la interfaz Android de las operaciones que deben ser controladas por el servidor».
+
+Una última diferencia que debes recordar para la exposición:
+- CartItemDao.kt trabaja con el carrito local mediante Room y SQLite.
+- index.ts trabaja con los pedidos y el inventario del servidor mediante Cloud Functions y Firestore.
+En una frase: index.ts es el encargado de comprobar que una compra sea válida y registrarla correctamente en Firebase.
