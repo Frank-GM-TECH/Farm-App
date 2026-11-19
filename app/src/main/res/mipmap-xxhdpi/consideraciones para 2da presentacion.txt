@@ -1,0 +1,4 @@
+-Toda la logica debe estar en razon de un flujo, que hay que saber explicar.
+-mas alla del diseño, centrense en la logica, en que parte se ejecuta ese proceso,
+ en que me momento se invoca a codigo de barras y todo lo que se muestra en el flujo de la pantalla.
+-Corrutinas -> Funciones asincronas.
