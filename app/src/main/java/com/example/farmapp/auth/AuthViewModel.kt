@@ -1,5 +1,7 @@
 package com.example.farmapp.auth
 
+import android.util.Log
+import com.google.firebase.auth.FirebaseAuthException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -98,8 +100,20 @@ class AuthViewModel(
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (error: Exception) {
-                _uiState.update { it.copy(isLoading = false,
-                    errorMessageRes = R.string.auth_error_google) }
+                // Diagnóstico seguro para builds instaladas desde Google Play:
+                // no registrar ID tokens, correos ni mensajes de excepción.
+                val diagnosticCode = (error as? FirebaseAuthException)?.errorCode
+                    ?: error.javaClass.simpleName
+                Log.e(
+                    "FarmAppGoogleAuth",
+                    "Firebase rechazó o no pudo completar Google Sign-In: $diagnosticCode"
+                )
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessageRes = R.string.auth_error_google
+                    )
+                }
             }
         }
     }
