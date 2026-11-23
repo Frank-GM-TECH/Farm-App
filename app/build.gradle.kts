@@ -56,13 +56,14 @@
                 )
             }
 
-            // Variante de publicacion: se mantiene separada de normalDebug.
-            // El applicationId es provisional hasta registrar la ficha en Google Play.
-            // Requiere app/src/playStore/google-services.json de farm-app-c5291
-            // con un cliente Android para com.frankgmtech.farmapp.
+            // Aplicación ya registrada en Google Play; conservar el applicationId.
+            // La versión de publicación avanza sin afectar normalDebug ni hu04Test.
+            // Usa app/src/playStore/google-services.json de farm-app-c5291.
             create("playStore") {
                 dimension = "environment"
                 applicationId = "com.frankgmtech.farmapp"
+                versionCode = 2
+                versionName = "0.2.0"
                 // Google Play exige API 36 para nuevas apps desde agosto de 2026.
                 // Se aplica solo a Play Store; normalDebug conserva targetSdk 35.
                 targetSdk = 36
