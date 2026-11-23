@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.MetadataChanges
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -80,7 +81,10 @@ class CatalogRealtimeSync(
 
         registration = firestore.collection("products")
             .whereEqualTo("active", true)
-            .addSnapshotListener { snapshot, error ->
+            // Si el servidor confirma los mismos productos que la caché,
+            // solo cambia metadata.isFromCache. Sin INCLUDE no llega ese
+            // evento y los dashboards quedan vacíos hasta modificar stock.
+            .addSnapshotListener(MetadataChanges.INCLUDE) { snapshot, error ->
                 if (error != null) {
                     Log.w("FarmAppCatalogSync", "Sincronización interrumpida; se conserva Room", error)
                     return@addSnapshotListener
