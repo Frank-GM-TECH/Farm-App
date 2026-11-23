@@ -1,5 +1,17 @@
 # FarmApp — ruta de publicación en Google Play
 
+> **Actualización 23/11/2026:** este documento conserva la
+> preparación **histórica** de la primera publicación; algunas expresiones
+> posteriores como “paquete provisional” o “pendiente de registrar” ya no
+> describen el estado actual. FarmApp **sí se distribuyó por Google Play**
+> mediante prueba interna, y el usuario confirmó que Google Sign-In quedó
+> operativo después de registrar las huellas Play App Signing en Firebase.
+> Para la actualización real con dashboards Vico, utilizar
+> [FARMAPP_RELEASE_PLAYSTORE_0_2_0.md](FARMAPP_RELEASE_PLAYSTORE_0_2_0.md):
+> versión `0.2.0` / `versionCode 2` preparada en el flavor `playStore`,
+> aún pendiente de generar AAB firmado y de subirlo a Play Console.
+
+
 ## Estado y variantes
 
 - **normalDebug**: paquete `com.example.farmapp`; sigue conectado a Firebase real (`farm-app-c5291`) y conserva App Check Debug para las pruebas existentes.
