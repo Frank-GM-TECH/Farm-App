@@ -3,6 +3,17 @@
 Fecha: 19 de noviembre de 2026. Proyecto Firebase: `farm-app-c5291`.
 Aplicación de distribución: `com.frankgmtech.farmapp`.
 
+> **Estado confirmado por prueba del usuario (23/11/2026): RESUELTO en Google Play.**
+> Tras registrar las huellas de los certificados Play App Signing en Firebase,
+> el usuario verificó que Google Sign-In funciona en la app **descargada de Google Play**.
+> Las diferencias SHA del JSON de GitHub documentadas más abajo son un registro
+> **histórico anterior a la corrección en Firebase**, no un error actual probado.
+> La próxima actualización 0.2.0 se prepara en
+> [FARMAPP_RELEASE_PLAYSTORE_0_2_0.md](FARMAPP_RELEASE_PLAYSTORE_0_2_0.md).
+> No es necesario volver a cambiar el proveedor Google ni las SHA para
+> desplegar los dashboards; no reemplazar el JSON sin comparar el archivo
+> descargado recientemente de Firebase.
+>
 ## Estado verificado
 
 - `normalDebug` (`com.example.farmapp`) ha autenticado con Google en el Samsung.
