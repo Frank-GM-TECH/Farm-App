@@ -136,6 +136,43 @@ Después:
    demostración sigan funcionando.
 7. Repetir pruebas de compilación para la variante destinada a Google Play.
 
+## Incidencia observada en Play Store 0.2.0 (23/11/2026)
+
+**Síntoma:** tras instalar la actualización desde Google Play, Inventario y
+Catálogo mostraron «Sin datos verificados de Firestore» alrededor de las
+07:45, mientras Mis pedidos ya mostraba un pedido. Tras efectuar una nueva
+compra se verificó la primera sincronización del catálogo a las 07:47 y
+ambos dashboards empezaron a presentar datos: 6 productos, 31 unidades
+y 3 categorías.
+
+**Causa técnica identificada en el código (altamente probable):** el
+`CatalogRealtimeSync` descartaba los snapshots procedentes de caché mediante
+`snapshot.metadata.isFromCache`, pero el `addSnapshotListener` utilizaba
+el modo predeterminado `MetadataChanges.EXCLUDE`. Si el servidor confirmó
+los mismos datos que ya tenía la caché, la transición `isFromCache: true →
+false` podía ser exclusivamente un cambio de metadatos y no notificaba al
+sincronizador. La modificación del stock por el pedido disparó un cambio de
+datos que permitió recibir una instantánea completa.
+
+**Corrección en `main`:** se añadió
+`addSnapshotListener(MetadataChanges.INCLUDE)` a la consulta de productos
+activos. Se sigue descartando cualquier snapshot que tenga
+`isFromCache == true`, por lo que las métricas **no** se presentan como
+verificadas si solo existen datos locales. No se han modificado reglas,
+Cloud Functions, compras ni colecciones.
+
+**Validación pendiente:** generar un nuevo release con `versionCode`
+superior a 2 y probar, sin hacer ningún pedido, que los dashboards
+se llenen tras iniciar sesión con conexión a Internet. Cerrar por completo
+y reabrir FarmApp con el stock sin cambios; comprobar que aparezcan
+métricas y hora de sincronización. Repetir una vez con el teléfono sin
+Internet para confirmar que no se muestren datos locales no verificados
+como si fueran del servidor.
+
+Referencias oficiales:
+- https://firebase.google.com/docs/firestore/manage-data/enable-offline
+- https://firebase.google.com/docs/firestore/query-data/listen
+
 ## Limitaciones y precauciones
 
 - No se han ejecutado compilaciones Android ni pruebas de teléfono desde el
